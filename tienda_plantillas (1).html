@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Plantillas web por sector — webYa</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#14181F; --ink2:#1E242F; --paper:#F2F0E9; --paper2:#EAE6DB;
+  --brass:#B8935B; --brass2:#8F6E3E; --brass3:#D9BE8F;
+  --slate:#5B6472; --line:rgba(20,24,31,0.12); --white:#FFF;
+  --green:#4A7A5A;
+}
+html{scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-weight:400;font-size:16px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;border:none;cursor:pointer;background:none}
+::selection{background:var(--brass3);color:var(--ink)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:rgba(242,240,233,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.logo{font-family:'Newsreader',serif;font-size:1.15rem;font-style:italic}
+.logo b{font-style:normal;font-weight:500}
+.nav-back{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase;color:var(--slate)}
+
+.hero{padding:100px 20px 40px}
+.hero-tag{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--brass2);border:1px solid var(--brass3);padding:6px 12px;display:inline-block;margin-bottom:24px}
+.hero-title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(2.1rem,8vw,3.2rem);line-height:1.08;letter-spacing:-0.5px;margin-bottom:20px}
+.hero-title em{font-style:italic;color:var(--brass2)}
+.hero-sub{font-size:0.95rem;color:var(--slate);line-height:1.7;max-width:480px}
+
+/* Two-path explainer */
+.paths{padding:8px 20px 40px}
+.paths-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:24px}
+.path-card{border:1px solid var(--line);background:var(--white);padding:22px;border-radius:3px}
+.path-card.featured{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.path-tag{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--brass2);margin-bottom:10px}
+.path-card.featured .path-tag{color:var(--brass3)}
+.path-name{font-family:'Newsreader',serif;font-size:1.4rem;margin-bottom:8px}
+.path-desc{font-size:0.85rem;line-height:1.6;color:var(--slate);margin-bottom:14px}
+.path-card.featured .path-desc{color:rgba(242,240,233,0.65)}
+.path-price{font-family:'Newsreader',serif;font-style:italic;font-size:1.3rem;color:var(--brass2)}
+.path-card.featured .path-price{color:var(--brass3)}
+.path-price span{font-family:'IBM Plex Sans',sans-serif;font-size:0.72rem;color:var(--slate);font-style:normal}
+.path-card.featured .path-price span{color:rgba(242,240,233,0.5)}
+
+/* Filter chips */
+.filters{padding:0 20px 24px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.filters::-webkit-scrollbar{display:none}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.3px;white-space:nowrap;padding:9px 15px;border:1px solid var(--line);border-radius:20px;color:var(--slate);flex-shrink:0}
+.chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* Gallery */
+.gallery{padding:0 20px 60px}
+.gallery-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.tmpl-card{border:1px solid var(--line);background:var(--white);border-radius:3px;overflow:hidden}
+.tmpl-swatch{height:130px;position:relative;display:flex;align-items:flex-end;padding:16px}
+.tmpl-swatch::before{content:'';position:absolute;inset:0;opacity:0.92}
+.tmpl-sector{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.8);position:relative;z-index:2}
+.tmpl-body{padding:18px}
+.tmpl-name{font-family:'Newsreader',serif;font-size:1.3rem;margin-bottom:6px}
+.tmpl-desc{font-size:0.82rem;color:var(--slate);line-height:1.55;margin-bottom:16px}
+.tmpl-actions{display:flex;gap:8px}
+.tmpl-btn-primary{flex:1;background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.3px;text-transform:uppercase;padding:13px 10px;text-align:center;border-radius:2px}
+.tmpl-btn-secondary{flex:1;border:1px solid var(--ink);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.3px;text-transform:uppercase;padding:12px 10px;text-align:center;border-radius:2px}
+.tmpl-price{font-family:'Newsreader',serif;font-style:italic;font-size:1.1rem;color:var(--brass2);margin-bottom:12px}
+
+.sw-rose::before{background:linear-gradient(135deg,#C4846A,#9C5E6B)}
+.sw-teal::before{background:linear-gradient(135deg,#4A8B7C,#356359)}
+.sw-amber::before{background:linear-gradient(135deg,#C9762E,#8A4E20)}
+.sw-sage::before{background:linear-gradient(135deg,#8A9A80,#647159)}
+.sw-violet::before{background:linear-gradient(135deg,#7C5FB0,#5A4380)}
+.sw-blue::before{background:linear-gradient(135deg,#3E6EA8,#2C5180)}
+.sw-red::before{background:linear-gradient(135deg,#B8402E,#8A2F22)}
+.sw-terra::before{background:linear-gradient(135deg,#B87454,#8C5738)}
+.sw-mustard::before{background:linear-gradient(135deg,#D9A441,#A87C2E)}
+.sw-navy::before{background:linear-gradient(135deg,#2C4A6B,#1E344D)}
+.sw-coral::before{background:linear-gradient(135deg,#D97D5C,#B05C3E)}
+.sw-rust::before{background:linear-gradient(135deg,#A85D3E,#7C4429)}
+.sw-olive::before{background:linear-gradient(135deg,#8C9A5B,#647142)}
+.sw-gold::before{background:linear-gradient(135deg,#C9A96E,#A8874F)}
+.sw-pink::before{background:linear-gradient(135deg,#B5657A,#9C5E6B)}
+
+/* Custom order CTA */
+.custom{padding:52px 20px;background:var(--ink);color:var(--paper)}
+.custom-tag{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--brass3);margin-bottom:16px}
+.custom-title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(1.8rem,7vw,2.4rem);line-height:1.15;margin-bottom:18px}
+.custom-title em{font-style:italic;color:var(--brass3)}
+.custom-body{font-size:0.9rem;color:rgba(242,240,233,0.6);line-height:1.7;max-width:480px;margin-bottom:28px}
+.custom-list{display:flex;flex-direction:column;margin-bottom:28px}
+.custom-item{padding:14px 0;border-top:1px solid rgba(242,240,233,0.15);font-size:0.85rem;display:flex;gap:10px}
+.custom-item:last-child{border-bottom:1px solid rgba(242,240,233,0.15)}
+.custom-item::before{content:'✓';color:var(--brass3);flex-shrink:0}
+.btn-custom{display:block;background:var(--brass3);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:0.78rem;letter-spacing:0.5px;text-transform:uppercase;padding:17px 24px;text-align:center;border-radius:2px}
+
+/* FAQ */
+.faq{padding:52px 20px}
+.section-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--brass2);margin-bottom:16px}
+.section-title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(1.8rem,7vw,2.2rem);line-height:1.15;margin-bottom:32px}
+.section-title em{font-style:italic;color:var(--brass2)}
+.faq-item{border-top:1px solid var(--line);padding:18px 0}
+.faq-item:last-child{border-bottom:1px solid var(--line)}
+.faq-q{font-size:0.95rem;font-weight:500;margin-bottom:8px}
+.faq-a{font-size:0.85rem;color:var(--slate);line-height:1.6}
+
+footer{padding:28px 20px;text-align:center;border-top:1px solid var(--line)}
+.footer-text{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--slate);letter-spacing:0.5px}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(min-width:700px){
+  nav{padding:22px 48px}
+  .hero,.paths,.filters,.gallery,.custom,.faq{padding-left:48px;padding-right:48px}
+  .paths-grid{grid-template-columns:1fr 1fr}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:1000px){
+  nav{padding:24px 64px}
+  .hero,.paths,.filters,.gallery,.custom,.faq{padding-left:64px;padding-right:64px}
+  .hero{padding-top:110px}
+  .gallery-grid{grid-template-columns:repeat(3,1fr)}
+  .custom{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">web<b>Ya</b></a>
+  <a href="index.html" class="nav-back">← Volver</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag reveal">PLANTILLAS WEB · POR SECTOR</div>
+  <h1 class="hero-title reveal">Tu web,<br>lista <em>desde ya.</em></h1>
+  <p class="hero-sub reveal">Plantillas profesionales pensadas para tu tipo de negocio. Yo la personalizo con tus datos reales y te la dejo lista — tú eliges cuánto quieres que la ajuste.</p>
+</section>
+
+<section class="paths">
+  <div class="paths-grid">
+    <div class="path-card reveal">
+      <div class="path-tag">Nivel básico</div>
+      <div class="path-name">Personalización</div>
+      <p class="path-desc">Cambio textos, fotos, teléfono y colores con tus datos reales. Entrega en 24-48h, lista para publicar.</p>
+      <div class="path-price">Desde 129€ <span>/ web</span></div>
+    </div>
+    <div class="path-card featured reveal">
+      <div class="path-tag">Nivel completo</div>
+      <div class="path-name">Todo incluido</div>
+      <p class="path-desc">Lo anterior, más reserva o contacto conectado de verdad, dominio y publicación. Lista para usar desde el primer día.</p>
+      <div class="path-price">Desde 300€ <span>/ web completa</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="filters">
+  <button class="chip active" data-filter="all">Todos</button>
+  <button class="chip" data-filter="salud">Salud y bienestar</button>
+  <button class="chip" data-filter="belleza">Belleza</button>
+  <button class="chip" data-filter="hogar">Hogar y oficios</button>
+  <button class="chip" data-filter="creativo">Creativo</button>
+  <button class="chip" data-filter="otros">Otros</button>
+</div>
+
+<section class="gallery">
+  <div class="gallery-grid" id="galleryGrid">
+
+    <div class="tmpl-card reveal" data-cat="salud">
+      <div class="tmpl-swatch sw-teal"><span class="tmpl-sector">Fisioterapia</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Cuadra</div>
+        <p class="tmpl-desc">Mosaico de tratamientos, reserva de cita, galería de fotos.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Cuadra%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="salud">
+      <div class="tmpl-swatch sw-sage"><span class="tmpl-sector">Psicología</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Consulta</div>
+        <p class="tmpl-desc">Tono cálido, reserva de sesión, confidencialidad visible.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Consulta%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="salud">
+      <div class="tmpl-swatch sw-teal"><span class="tmpl-sector">Veterinaria</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Clínica Veterinaria</div>
+        <p class="tmpl-desc">Consultas, vacunación, urgencias, cita online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Cl%C3%ADnica%20Veterinaria%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="salud">
+      <div class="tmpl-swatch sw-coral"><span class="tmpl-sector">Nutrición</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Consulta de Nutrición</div>
+        <p class="tmpl-desc">Planes personalizados, reserva de cita online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Consulta%20de%20Nutrici%C3%B3n%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="salud">
+      <div class="tmpl-swatch sw-sage"><span class="tmpl-sector">Yoga y entrenamiento</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Yoga & Entrenamiento</div>
+        <p class="tmpl-desc">Clases, reserva online, primera sesión gratis.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Yoga%20%26%20Entrenamiento%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="belleza">
+      <div class="tmpl-swatch sw-rose"><span class="tmpl-sector">Centro de estética</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Mima-T</div>
+        <p class="tmpl-desc">Mosaico visual, 3D interactivo, reserva online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Mima-T%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="belleza">
+      <div class="tmpl-swatch sw-rose"><span class="tmpl-sector">Peluquería</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Salón</div>
+        <p class="tmpl-desc">Galería de trabajos, reserva de cita, testimonios.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Sal%C3%B3n%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="belleza">
+      <div class="tmpl-swatch sw-rust"><span class="tmpl-sector">Masajes</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Centro de Masajes</div>
+        <p class="tmpl-desc">Tipos de masaje, reserva de sesión online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Centro%20de%20Masajes%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="hogar">
+      <div class="tmpl-swatch sw-amber"><span class="tmpl-sector">Mecánica</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Taller Mecánico</div>
+        <p class="tmpl-desc">Estética industrial, presupuesto online, servicios en ficha.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Taller%20Mec%C3%A1nico%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="hogar">
+      <div class="tmpl-swatch sw-amber"><span class="tmpl-sector">Reformas</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Reformas Integrales</div>
+        <p class="tmpl-desc">Galería de proyectos, presupuesto cerrado, proceso claro.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Reformas%20Integrales%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="hogar">
+      <div class="tmpl-swatch sw-red"><span class="tmpl-sector">Cerrajería</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Cerrajería 24h</div>
+        <p class="tmpl-desc">Contacto de urgencias inmediato, diseño directo.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Cerrajer%C3%ADa%2024h%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="hogar">
+      <div class="tmpl-swatch sw-navy"><span class="tmpl-sector">Gestoría</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Gestoría</div>
+        <p class="tmpl-desc">Servicios fiscales y laborales, cita online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Gestor%C3%ADa%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="creativo">
+      <div class="tmpl-swatch sw-gold"><span class="tmpl-sector">Fotografía</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Estudio Fotográfico</div>
+        <p class="tmpl-desc">Portfolio visual a pantalla completa, estilo editorial.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Estudio%20Fotogr%C3%A1fico%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="creativo">
+      <div class="tmpl-swatch sw-violet"><span class="tmpl-sector">Música</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Academia de Música</div>
+        <p class="tmpl-desc">Estilo urbano, 3D de guitarra, inscripción online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Academia%20de%20M%C3%BAsica%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="creativo">
+      <div class="tmpl-swatch sw-terra"><span class="tmpl-sector">Floristería</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Silk Flowers</div>
+        <p class="tmpl-desc">Narrativa visual a pantalla completa, pedidos online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Silk%20Flowers%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="creativo">
+      <div class="tmpl-swatch sw-terra"><span class="tmpl-sector">Interiorismo</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Estudio de Interiorismo</div>
+        <p class="tmpl-desc">Portfolio visual, propuesta de valor clara.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Estudio%20de%20Interiorismo%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="otros">
+      <div class="tmpl-swatch sw-mustard"><span class="tmpl-sector">Tienda de mascotas</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">DOGGUAO</div>
+        <p class="tmpl-desc">Catálogo online, 3D de hueso, contacto rápido.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20DOGGUAO%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="otros">
+      <div class="tmpl-swatch sw-blue"><span class="tmpl-sector">Academia de idiomas</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Academia de Idiomas</div>
+        <p class="tmpl-desc">3D de globo terráqueo, inscripción online.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Academia%20de%20Idiomas%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tmpl-card reveal" data-cat="otros">
+      <div class="tmpl-swatch sw-pink"><span class="tmpl-sector">Wedding planner</span></div>
+      <div class="tmpl-body">
+        <div class="tmpl-name">Wedding Planner</div>
+        <p class="tmpl-desc">Diseño romántico, formulario de contacto.</p>
+        <div class="tmpl-price">Desde 129€</div>
+        <div class="tmpl-actions">
+          <a href="https://wa.me/34682539732?text=Hola%21%20Me%20interesa%20la%20plantilla%20Wedding%20Planner%20que%20vi%20en%20tu%20web%2C%20%C2%BFme%20cuentas%20m%C3%A1s%3F" class="tmpl-btn-primary" style="flex:1 1 100%" target="_blank">Pedir esta plantilla →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="custom" id="contacto">
+  <div>
+    <div class="custom-tag reveal">Servicio completo</div>
+    <h2 class="custom-title reveal">¿Prefieres que<br>te la <em>deje lista?</em></h2>
+    <p class="custom-body reveal">Me encargo de todo: personalización con tus textos y fotos reales, dominio, publicación, y ajustes hasta que quede exactamente como quieres.</p>
+    <div class="custom-list">
+      <div class="custom-item reveal">Textos y fotos de tu negocio real</div>
+      <div class="custom-item reveal">Reserva o contacto conectado y funcionando</div>
+      <div class="custom-item reveal">Publicada con tu dominio propio</div>
+      <div class="custom-item reveal">Ajustes incluidos hasta que estés conforme</div>
+    </div>
+  </div>
+  <a href="https://wa.me/34682539732" class="btn-custom reveal">Pedir presupuesto por WhatsApp</a>
+</section>
+
+<section class="faq">
+  <div class="section-eyebrow reveal">Dudas</div>
+  <h2 class="section-title reveal">Preguntas <em>frecuentes.</em></h2>
+  <div class="faq-item reveal">
+    <div class="faq-q">¿Qué recibo si pido el nivel básico?</div>
+    <div class="faq-a">La plantilla del sector que elijas, personalizada con tus textos, fotos y teléfono reales, lista para que tú (o quien tengas de confianza) la publique.</div>
+  </div>
+  <div class="faq-item reveal">
+    <div class="faq-q">¿Cuál es la diferencia con el nivel completo?</div>
+    <div class="faq-a">El completo incluye también conectar la reserva o el formulario de contacto de verdad, comprar y configurar el dominio, y dejarla publicada — no tienes que tocar nada.</div>
+  </div>
+  <div class="faq-item reveal">
+    <div class="faq-q">¿Incluye el dominio o el hosting?</div>
+    <div class="faq-a">No, eso se contrata aparte (unos 10-15€/año). Si quieres, te ayudo a configurarlo en el servicio completo.</div>
+  </div>
+  <div class="faq-item reveal">
+    <div class="faq-q">¿Y si mi sector no está en la lista?</div>
+    <div class="faq-a">Escríbeme y creamos una nueva desde cero, adaptada a tu negocio.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-text">© 2026 WEBYA — BILBAO</div>
+</footer>
+
+<script>
+document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1}).observe(el));
+
+const chips = document.querySelectorAll('.chip');
+const cards = document.querySelectorAll('.tmpl-card');
+chips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const filter = chip.dataset.filter;
+    cards.forEach(card => {
+      if (filter === 'all' || card.dataset.cat === filter) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
