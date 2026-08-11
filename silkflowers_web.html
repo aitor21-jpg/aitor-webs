@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silk Flowers — Floristería · Casco Viejo Bilbao</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#100C0D; --white:#FFFFFF; --ivory:#FBF6F2;
+  --rose:#B5657A; --rose2:#8A3F52; --rose3:#D89AA8; --blush:#F2DCE1;
+  --gold:#C9A96E; --gray:#8A8482; --line:rgba(16,12,13,0.1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--black);overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none;font-weight:300}
+a,button,select,input,textarea{cursor:none}
+.cursor-dot{position:fixed;width:6px;height:6px;background:var(--rose);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:opacity .3s}
+.cursor-ring{position:fixed;width:34px;height:34px;border:1px solid rgba(181,101,122,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s,background .3s}
+.cursor-ring.hovering{width:70px;height:70px;border-color:var(--rose);background:rgba(181,101,122,0.06)}
+@media(pointer:coarse){.cursor-dot,.cursor-ring{display:none}body,a,button,select,input,textarea{cursor:auto}}
+.preloader{position:fixed;inset:0;background:var(--ivory);z-index:10000;display:flex;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s}
+.preloader.done{opacity:0;visibility:hidden}
+.pl-name{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(2.4rem,6vw,4rem);color:var(--black);overflow:hidden;text-align:center}
+.pl-name span{display:inline-block;transform:translateY(110%);animation:plUp .9s cubic-bezier(.16,1,.3,1) .2s forwards}
+.pl-sub{font-size:0.6rem;letter-spacing:5px;text-transform:uppercase;color:var(--rose2);margin-top:18px;opacity:0;animation:plFade .8s ease .8s forwards;text-align:center}
+@keyframes plUp{to{transform:translateY(0)}} @keyframes plFade{to{opacity:1}}
+.progress{position:fixed;top:0;left:0;height:1px;background:var(--rose);z-index:500;width:0%}
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:36px 56px;mix-blend-mode:difference}
+.logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.6rem;color:var(--white);text-decoration:none}
+.nav-links{display:flex;gap:44px;list-style:none}
+.nav-links a{font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--white);text-decoration:none;opacity:0.7;transition:opacity .3s}
+.nav-links a:hover{opacity:1}
+.nav-book{font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--white);text-decoration:none;border-bottom:1px solid var(--white);padding-bottom:3px}
+
+/* SECTION 1 — full bleed centered intro, no split */
+.intro{min-height:100vh;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:120px 24px 60px}
+.intro-canvas{position:absolute;inset:0;opacity:0.9}
+#canvas-sf{position:absolute;inset:0}
+.intro-content{position:relative;z-index:5;max-width:820px}
+.intro-eyebrow{font-size:0.62rem;letter-spacing:5px;text-transform:uppercase;color:var(--rose3);margin-bottom:30px;opacity:0;animation:fadeUp 1s ease 0.4s forwards}
+.intro-title{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(3rem,8vw,7rem);line-height:0.98;color:var(--white);letter-spacing:-1px}
+.intro-title .ln{display:block;overflow:hidden}
+.intro-title .ln span{display:block;transform:translateY(110%);animation:lineUp 1.2s cubic-bezier(.16,1,.3,1) forwards}
+.intro-title .ln:nth-child(1) span{animation-delay:0.6s}
+.intro-title .ln:nth-child(2) span{animation-delay:0.75s}
+.intro-title em{font-style:italic;color:var(--rose3)}
+.intro-sub{font-size:0.95rem;color:rgba(255,255,255,0.5);margin-top:36px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.9;opacity:0;animation:fadeUp 1s ease 1.2s forwards}
+.intro-cta{margin-top:48px;opacity:0;animation:fadeUp 1s ease 1.4s forwards}
+.intro-cta a{display:inline-flex;align-items:center;gap:16px;font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--white);text-decoration:none;padding:18px 40px;border:1px solid rgba(255,255,255,0.3);transition:background .4s,border-color .4s}
+.intro-cta a:hover{background:var(--rose);border-color:var(--rose)}
+.scroll-cue{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fadeUp 1s ease 1.7s forwards}
+.scroll-line{width:1px;height:50px;background:linear-gradient(rgba(255,255,255,0.5),transparent);animation:scrollLine 2s ease-in-out infinite}
+@keyframes scrollLine{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@keyframes lineUp{to{transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION 2 — full width statement */
+.statement{padding:200px 12vw;background:var(--ivory);text-align:center}
+.stm-eyebrow{font-size:0.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose2);margin-bottom:40px}
+.stm-text{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(1.8rem,3.6vw,3.2rem);line-height:1.35;color:var(--black)}
+.stm-text em{font-style:italic;color:var(--rose2)}
+
+/* SECTION 3 — full bleed image break */
+.imgbreak{height:80vh;position:relative;overflow:hidden}
+.imgbreak img{width:100%;height:100%;object-fit:cover;will-change:transform}
+.imgbreak-label{position:absolute;bottom:56px;left:56px;color:var(--white);z-index:2}
+.imgbreak-label .il-top{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--rose3);margin-bottom:8px}
+.imgbreak-label .il-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.6rem}
+.imgbreak::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(16,12,13,0.5),transparent 45%)}
+
+/* SECTION 4 — collections as alternating full-width rows */
+.collections{padding:160px 0;background:var(--black)}
+.coll-header{text-align:center;padding:0 24px;margin-bottom:120px}
+.coll-eyebrow{font-size:0.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose3);margin-bottom:24px}
+.coll-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.2rem,5vw,4rem);color:var(--white)}
+.coll-title em{font-style:italic;color:var(--rose3)}
+.coll-row{display:grid;grid-template-columns:1fr 1fr;min-height:70vh;position:relative;border-top:1px solid rgba(255,255,255,0.07)}
+.coll-row:nth-child(even) .coll-num-col{order:2}
+.coll-num-col{display:flex;flex-direction:column;justify-content:center;padding:60px 80px}
+.coll-visual-col{position:relative;overflow:hidden;cursor:none}
+.coll-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--rose3);margin-bottom:28px}
+.coll-name{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2rem,3.6vw,3.2rem);color:var(--white);margin-bottom:24px;line-height:1.1}
+.coll-desc{font-size:0.86rem;line-height:1.9;color:rgba(255,255,255,0.4);max-width:400px;margin-bottom:36px}
+.coll-link{display:inline-flex;align-items:center;gap:14px;font-size:0.64rem;letter-spacing:3px;text-transform:uppercase;color:var(--white);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.3);padding-bottom:4px;width:fit-content;transition:border-color .3s,gap .3s}
+.coll-link:hover{border-color:var(--rose3);gap:20px}
+.coll-visual{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 50%, rgba(181,101,122,0.12), transparent 70%)}
+.coll-visual canvas{width:100%;height:100%}
+
+/* SECTION 5 — testimonial marquee style */
+.test-strip{padding:120px 0;background:var(--ivory);overflow:hidden}
+.test-track{display:flex;gap:0;animation:testScroll 40s linear infinite}
+.test-block{flex-shrink:0;width:420px;padding:0 60px;border-right:1px solid var(--line)}
+.test-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;line-height:1.5;color:var(--black);margin-bottom:20px}
+.test-name{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray)}
+@keyframes testScroll{to{transform:translateX(-50%)}}
+
+/* SECTION 6 — order/contact, asymmetric */
+.order{padding:180px 12vw;background:var(--black);display:grid;grid-template-columns:0.9fr 1.1fr;gap:100px;align-items:start}
+.order-eyebrow{font-size:0.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose3);margin-bottom:30px}
+.order-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.4rem,4.5vw,4rem);color:var(--white);line-height:1.1;margin-bottom:40px}
+.order-title em{font-style:italic;color:var(--rose3)}
+.avail-widget{display:flex;align-items:center;gap:14px;margin-bottom:40px}
+.avail-dot{width:7px;height:7px;border-radius:50%;background:#8FD4A8;flex-shrink:0;position:relative}
+.avail-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid #8FD4A8;animation:availPulse 2s ease-out infinite}
+@keyframes availPulse{0%{transform:scale(0.8);opacity:1}100%{transform:scale(2.4);opacity:0}}
+.avail-text{font-size:0.78rem;color:rgba(255,255,255,0.55)}
+.avail-text strong{color:var(--white)}
+.order-info{display:flex;flex-direction:column;gap:22px}
+.oi-item{font-size:0.82rem;color:rgba(255,255,255,0.5);padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.oi-item strong{color:var(--white);display:block;margin-bottom:4px;font-weight:400}
+.order-form-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.7rem;color:var(--white);margin-bottom:36px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:28px}
+.form-group label{display:block;font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px}
+.form-group input,.form-group select,.form-group textarea{width:100%;border:none;border-bottom:1px solid rgba(255,255,255,0.2);padding:10px 0;font-size:0.92rem;font-family:'Jost',sans-serif;color:var(--white);background:transparent;outline:none;transition:border-color .3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--rose3)}
+.form-group select option{background:var(--black)}
+.form-group textarea{resize:none;height:70px}
+.form-group{margin-bottom:28px}
+.btn-form{width:100%;background:transparent;color:var(--white);font-size:0.66rem;letter-spacing:3px;text-transform:uppercase;padding:20px;border:1px solid var(--rose3);margin-top:12px;transition:background .3s;font-family:'Jost',sans-serif;font-weight:400}
+.btn-form:hover{background:var(--rose3);color:var(--black)}
+
+footer{padding:60px 56px;background:var(--black);display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08)}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--white)}
+.footer-links{display:flex;gap:30px}
+.footer-links a{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .3s}
+.footer-links a:hover{color:var(--rose3)}
+.footer-copy{font-size:0.58rem;color:rgba(255,255,255,0.25);letter-spacing:1px}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(6,4,4,0.94);backdrop-filter:blur(24px);z-index:2000;opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s;display:flex;align-items:center;justify-content:center;padding:40px;cursor:auto}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal-box{background:#0F0B0C;width:100%;max-width:960px;max-height:88vh;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;position:relative;transform:scale(0.95) translateY(16px);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.modal-overlay.open .modal-box{transform:scale(1) translateY(0)}
+.modal-close{position:absolute;top:24px;right:24px;z-index:20;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal-close svg path{stroke:rgba(255,255,255,0.7)}
+.modal-visual{position:relative;background:#0A0808;min-height:320px}
+.modal-visual canvas{position:absolute;inset:0}
+.modal-content{padding:56px}
+.modal-eyebrow{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--rose3);margin-bottom:20px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:2.2rem;color:var(--white);line-height:1.15;margin-bottom:22px}
+.modal-title em{font-style:italic;color:var(--rose3)}
+.modal-desc{font-size:0.86rem;line-height:1.85;color:rgba(255,255,255,0.5);margin-bottom:28px}
+.modal-features{display:flex;flex-direction:column;gap:0;margin-bottom:32px}
+.mf-item{display:flex;gap:14px;padding:14px 0;border-top:1px solid rgba(255,255,255,0.07);font-size:0.8rem;color:rgba(255,255,255,0.55)}
+.mf-item strong{color:#fff;font-weight:400}
+.mf-dot{width:5px;height:5px;border-radius:50%;background:var(--rose3);flex-shrink:0;margin-top:6px}
+.modal-cta{display:inline-block;color:var(--white);font-size:0.64rem;letter-spacing:3px;text-transform:uppercase;padding:16px 34px;border:1px solid var(--rose3);text-decoration:none;transition:background .3s}
+.modal-cta:hover{background:var(--rose3);color:#000}
+body.modal-lock{overflow:hidden}
+
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  nav{padding:24px}
+  .nav-links{display:none}
+  .statement{padding:120px 24px}
+  .coll-row{grid-template-columns:1fr;min-height:auto}
+  .coll-row:nth-child(even) .coll-num-col{order:0}
+  .coll-num-col{padding:48px 24px}
+  .coll-visual-col{height:50vh}
+  .order{grid-template-columns:1fr;padding:100px 24px;gap:56px}
+  .form-row{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:20px;padding:48px 24px}
+  .modal-box{grid-template-columns:1fr}
+  .modal-visual{min-height:220px}
+  .modal-content{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+<div class="cursor-dot" id="cDot"></div>
+<div class="cursor-ring" id="cRing"></div>
+<div class="preloader" id="preloader">
+  <div>
+    <div class="pl-name"><span>Silk Flowers</span></div>
+    <div class="pl-sub">Casco Viejo, Bilbao</div>
+  </div>
+</div>
+<div class="progress" id="progress"></div>
+<nav id="nav">
+  <a href="#" class="logo">Silk Flowers</a>
+  <ul class="nav-links">
+    <li><a href="#colecciones">Colecciones</a></li>
+    <li><a href="#pedir">Pedir</a></li>
+  </ul>
+  <a href="#pedir" class="nav-book">Contacto</a>
+</nav>
+
+<section class="intro">
+  <canvas id="canvas-sf" class="intro-canvas"></canvas>
+  <div class="intro-content">
+    <div class="intro-eyebrow">Floristería · Casco Viejo · Bilbao</div>
+    <h1 class="intro-title">
+      <span class="ln"><span>Flores que dicen</span></span>
+      <span class="ln"><span>lo que <em>tú sientes.</em></span></span>
+    </h1>
+    <p class="intro-sub">Arreglos florales hechos a mano, entrega el mismo día en Bilbao.</p>
+    <div class="intro-cta"><a href="#pedir">Hacer un pedido</a></div>
+  </div>
+  <div class="scroll-cue"><div class="scroll-line"></div></div>
+</section>
+
+<section class="statement">
+  <div class="stm-eyebrow reveal">Filosofía</div>
+  <p class="stm-text reveal reveal-d1">No vendemos flores. Componemos <em>momentos</em> — cada ramo pensado para la persona exacta que lo va a recibir, no para un catálogo genérico.</p>
+</section>
+
+<section class="imgbreak">
+  <img id="parallaxImg" src="https://images.unsplash.com/photo-1522748906645-95d8adfd52c7?w=1400&q=88&fit=crop" alt="Ramo de flores Silk Flowers">
+  <div class="imgbreak-label">
+    <div class="il-top">Hecho a mano</div>
+    <div class="il-txt">Harategi Zahar Kalea, 10</div>
+  </div>
+</section>
+
+<section class="collections" id="colecciones">
+  <div class="coll-header">
+    <div class="coll-eyebrow reveal">Colecciones</div>
+    <h2 class="coll-title reveal reveal-d1">Flores para cada <em>ocasión.</em></h2>
+  </div>
+
+  <div class="coll-row reveal" data-modal-trigger="ramos">
+    <div class="coll-num-col">
+      <div class="coll-num">I</div>
+      <h3 class="coll-name">Ramos personalizados</h3>
+      <p class="coll-desc">Composiciones únicas hechas a mano, adaptadas a la ocasión y el color que busques.</p>
+      <a href="#" class="coll-link" data-modal="ramos">Ver detalle</a>
+    </div>
+    <div class="coll-visual-col" data-modal="ramos"><div class="coll-visual" data-shape="ramos"></div></div>
+  </div>
+
+  <div class="coll-row reveal">
+    <div class="coll-num-col">
+      <div class="coll-num">II</div>
+      <h3 class="coll-name">Bodas y eventos</h3>
+      <p class="coll-desc">Decoración floral integral para bodas y eventos — desde el ramo hasta la mesa presidencial.</p>
+      <a href="#" class="coll-link" data-modal="bodas">Ver detalle</a>
+    </div>
+    <div class="coll-visual-col" data-modal="bodas"><div class="coll-visual" data-shape="bodas"></div></div>
+  </div>
+
+  <div class="coll-row reveal">
+    <div class="coll-num-col">
+      <div class="coll-num">III</div>
+      <h3 class="coll-name">Coronas funerarias</h3>
+      <p class="coll-desc">Composiciones respetuosas y de calidad, con entrega puntual en el momento que más se necesita.</p>
+      <a href="#" class="coll-link" data-modal="funeral">Ver detalle</a>
+    </div>
+    <div class="coll-visual-col" data-modal="funeral"><div class="coll-visual" data-shape="funeral"></div></div>
+  </div>
+
+  <div class="coll-row reveal">
+    <div class="coll-num-col">
+      <div class="coll-num">IV</div>
+      <h3 class="coll-name">Plantas de interior</h3>
+      <p class="coll-desc">Selección de plantas duraderas para el hogar, con consejos de cuidado incluidos.</p>
+      <a href="#" class="coll-link" data-modal="plantas">Ver detalle</a>
+    </div>
+    <div class="coll-visual-col" data-modal="plantas"><div class="coll-visual" data-shape="plantas"></div></div>
+  </div>
+
+  <div class="coll-row reveal">
+    <div class="coll-num-col">
+      <div class="coll-num">V</div>
+      <h3 class="coll-name">Suscripción floral</h3>
+      <p class="coll-desc">Flores frescas en tu puerta cada semana o cada mes, sin tener que pensarlo.</p>
+      <a href="#" class="coll-link" data-modal="suscripcion">Ver detalle</a>
+    </div>
+    <div class="coll-visual-col" data-modal="suscripcion"><div class="coll-visual" data-shape="suscripcion"></div></div>
+  </div>
+</section>
+
+<section class="test-strip">
+  <div class="test-track">
+    <div class="test-block"><p class="test-quote">"Hermosa floristería en el centro de Bilbao, arreglos personalizados y buena atención."</p><span class="test-name">Cliente Google</span></div>
+    <div class="test-block"><p class="test-quote">"El bouquet más bonito que he pedido, se nota que hacen las cosas con mimo."</p><span class="test-name">Cliente Casco Viejo</span></div>
+    <div class="test-block"><p class="test-quote">"Encargué desde fuera y todo perfecto, muy atentas con la comunicación."</p><span class="test-name">Cliente Bilbao</span></div>
+    <div class="test-block"><p class="test-quote">"Hermosa floristería en el centro de Bilbao, arreglos personalizados y buena atención."</p><span class="test-name">Cliente Google</span></div>
+    <div class="test-block"><p class="test-quote">"El bouquet más bonito que he pedido, se nota que hacen las cosas con mimo."</p><span class="test-name">Cliente Casco Viejo</span></div>
+    <div class="test-block"><p class="test-quote">"Encargué desde fuera y todo perfecto, muy atentas con la comunicación."</p><span class="test-name">Cliente Bilbao</span></div>
+  </div>
+</section>
+
+<section class="order" id="pedir">
+  <div>
+    <div class="order-eyebrow reveal">Pedir</div>
+    <h2 class="order-title reveal reveal-d1">Tu ramo, en <em>un minuto.</em></h2>
+    <div class="avail-widget reveal reveal-d2"><span class="avail-dot"></span><span class="avail-text">Entrega <strong>hoy mismo</strong> en pedidos antes de las 14h</span></div>
+    <div class="order-info reveal reveal-d2">
+      <div class="oi-item"><strong>WhatsApp</strong>Confirmación en menos de 2 horas</div>
+      <div class="oi-item"><strong>Harategi Zahar Kalea, 10</strong>48005 Bilbao · Casco Viejo</div>
+      <div class="oi-item"><strong>660 32 83 43</strong>Llamadas y WhatsApp</div>
+    </div>
+  </div>
+  <div class="reveal reveal-d2">
+    <h3 class="order-form-title">Hacer un pedido</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+      <div class="form-group"><label>Teléfono</label><input type="tel" placeholder="600 000 000"></div>
+    </div>
+    <div class="form-group">
+      <label>Ocasión</label>
+      <select>
+        <option value="">Selecciona</option>
+        <option>Ramo personalizado</option>
+        <option>Boda o evento</option>
+        <option>Corona funeraria</option>
+        <option>Planta de interior</option>
+        <option>Suscripción floral</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Fecha de entrega</label><input type="date"></div>
+    <div class="form-group"><label>Mensaje</label><textarea placeholder="Colores, presupuesto, lo que necesites..."></textarea></div>
+    <button class="btn-form">Enviar pedido</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Silk Flowers</div>
+  <div class="footer-links"><a href="#">Instagram</a><a href="#">Facebook</a></div>
+  <div class="footer-copy">© 2026 · Bilbao</div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+    <div class="modal-visual"><canvas id="modalCanvas"></canvas></div>
+    <div class="modal-content">
+      <div class="modal-eyebrow" id="modalEyebrow"></div>
+      <h3 class="modal-title" id="modalTitle"></h3>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div class="modal-features" id="modalFeatures"></div>
+      <a href="#pedir" class="modal-cta">Hacer pedido</a>
+    </div>
+  </div>
+</div>
+
+<script>
+window.addEventListener('load', ()=>{ setTimeout(()=>document.getElementById('preloader').classList.add('done'), 1300); });
+const cDot=document.getElementById('cDot'),cRing=document.getElementById('cRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cDot.style.left=mx+'px';cDot.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*0.16;ry+=(my-ry)*0.16;cRing.style.left=rx+'px';cRing.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,select,input,textarea,[data-modal]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cRing.classList.add('hovering'));
+  el.addEventListener('mouseleave',()=>cRing.classList.remove('hovering'));
+});
+const progress=document.getElementById('progress');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  progress.style.width=(window.scrollY/h*100)+'%';
+  const img=document.getElementById('parallaxImg');
+  if(img){
+    const r=img.parentElement.getBoundingClientRect();
+    if(r.top<window.innerHeight&&r.bottom>0){
+      const p=(window.innerHeight-r.top)/(window.innerHeight+r.height);
+      img.style.transform=`translateY(${(p-0.5)*-50}px) scale(1.1)`;
+    }
+  }
+});
+const reveals=document.querySelectorAll('.reveal');
+new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08}).observe ? reveals.forEach(el=>new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08}).observe(el)) : null;
+
+// HERO 3D — full bleed floating bouquet
+(function(){
+const canvas=document.getElementById('canvas-sf');
+const container=canvas.parentElement;
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+function size(){return{w:container.clientWidth,h:container.clientHeight}}
+let s=size();renderer.setSize(s.w,s.h);renderer.setClearColor(0x100C0D,1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x100C0D,0.018);
+const camera=new THREE.PerspectiveCamera(38,s.w/s.h,0.1,100);camera.position.set(0,0,9);
+scene.add(new THREE.AmbientLight(0xffffff,0.3));
+const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(4,6,4);scene.add(key);
+const roseLight=new THREE.PointLight(0xB5657A,3.2,12);roseLight.position.set(-3,1,3);scene.add(roseLight);
+const petalMat=new THREE.MeshStandardMaterial({color:0xB5657A,metalness:0.1,roughness:0.45});
+const petalMat2=new THREE.MeshStandardMaterial({color:0xD89AA8,metalness:0.1,roughness:0.45});
+const goldMat=new THREE.MeshStandardMaterial({color:0xC9A96E,metalness:0.7,roughness:0.2});
+function flower(mat,size){const fg=new THREE.Group();for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;const p=new THREE.Mesh(new THREE.SphereGeometry(size*0.4,10,10),mat);p.scale.set(1,0.45,1.5);p.position.set(Math.cos(a)*size*0.45,0,Math.sin(a)*size*0.45);p.rotation.y=-a;fg.add(p);}fg.add(new THREE.Mesh(new THREE.SphereGeometry(size*0.26,14,14),goldMat));return fg;}
+const g=new THREE.Group();
+const flowers=[];
+for(let i=0;i<9;i++){
+  const f=flower(i%2===0?petalMat:petalMat2, 0.5+Math.random()*0.4);
+  f.position.set((Math.random()-0.5)*4,(Math.random()-0.5)*3,(Math.random()-0.5)*2);
+  f.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
+  flowers.push({mesh:f,speed:0.1+Math.random()*0.2,offset:Math.random()*10});
+  g.add(f);
+}
+scene.add(g);
+window.addEventListener('resize',()=>{s=size();camera.aspect=s.w/s.h;camera.updateProjectionMatrix();renderer.setSize(s.w,s.h);});
+const clock=new THREE.Clock();
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();
+  flowers.forEach(fl=>{fl.mesh.rotation.y+=0.003;fl.mesh.position.y+=Math.sin(t*fl.speed+fl.offset)*0.002;});
+  g.rotation.y=t*0.03;
+  roseLight.intensity=3+Math.sin(t*1.2)*0.8;
+  renderer.render(scene,camera);
+}
+animate();
+})();
+
+// MODAL SYSTEM
+const SITE_DATA={
+  'ramos':{eyebrow:'Ramos personalizados',title:'Cada ramo, <em>una historia distinta.</em>',desc:'Diseñamos cada ramo a mano según la ocasión, el color favorito o lo que quieras transmitir.',features:['<strong>100% hecho a mano</strong> el mismo día','Flor <strong>fresca de temporada</strong>','Adaptado a <strong>tu presupuesto</strong>'],shape:'bouquet'},
+  'bodas':{eyebrow:'Bodas y eventos',title:'Tu día, <em>vestido de flores.</em>',desc:'Desde el ramo de novia hasta la decoración completa del evento — coordinamos cada detalle floral.',features:['<strong>Ramo de novia</strong> a medida','Decoración de <strong>mesas y ceremonia</strong>','Coordinación el <strong>día del evento</strong>'],shape:'archway'},
+  'funeral':{eyebrow:'Coronas funerarias',title:'Un último gesto, <em>con cuidado.</em>',desc:'Composiciones respetuosas y de calidad, con entrega puntual garantizada.',features:['<strong>Entrega puntual</strong> garantizada','Composiciones <strong>respetuosas</strong>','Atención <strong>sensible y cercana</strong>'],shape:'wreath'},
+  'plantas':{eyebrow:'Plantas de interior',title:'Verde que <em>dura todo el año.</em>',desc:'Selección de plantas resistentes para el hogar, con consejos de cuidado incluidos.',features:['Plantas de <strong>fácil cuidado</strong>','Asesoramiento <strong>incluido</strong>','Maceteros a <strong>juego</strong>'],shape:'plant'},
+  'suscripcion':{eyebrow:'Suscripción floral',title:'Flores frescas, <em>sin pensarlo.</em>',desc:'Recibe un ramo nuevo cada semana o cada mes, elegido según la temporada.',features:['Entrega <strong>semanal o mensual</strong>','Elección <strong>según temporada</strong>','Cancela <strong>cuando quieras</strong>'],shape:'subscription'}
+};
+const modalOverlay=document.getElementById('modalOverlay'),modalClose=document.getElementById('modalClose');
+let modalRenderer,modalScene,modalCamera,modalGroup,modalAnimId,modalAuto=true,modalDrag=false,modalPrev={x:0,y:0},modalTY=0.4,modalTX=0.1,modalCY=0.4,modalCX=0.1;
+function openModal(key){
+  const d=SITE_DATA[key];if(!d)return;
+  document.getElementById('modalEyebrow').textContent=d.eyebrow;
+  document.getElementById('modalTitle').innerHTML=d.title;
+  document.getElementById('modalDesc').textContent=d.desc;
+  document.getElementById('modalFeatures').innerHTML=d.features.map(f=>'<div class="mf-item"><span class="mf-dot"></span><span>'+f+'</span></div>').join('');
+  modalOverlay.classList.add('open');document.body.classList.add('modal-lock');
+  requestAnimationFrame(()=>initModal3D(d.shape));
+}
+function closeModal(){modalOverlay.classList.remove('open');document.body.classList.remove('modal-lock');if(modalAnimId)cancelAnimationFrame(modalAnimId);if(modalRenderer){modalRenderer.dispose();modalRenderer=null;}}
+modalClose.addEventListener('click',closeModal);
+modalOverlay.addEventListener('click',e=>{if(e.target===modalOverlay)closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.querySelectorAll('[data-modal]').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();openModal(el.getAttribute('data-modal'));});});
+
+function initModal3D(shapeType){
+  const canvas=document.getElementById('modalCanvas'),container=canvas.parentElement;
+  const w=container.clientWidth,h=container.clientHeight;
+  modalRenderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  modalRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));modalRenderer.setSize(w,h);
+  modalRenderer.setClearColor(0x0A0808,1);
+  modalScene=new THREE.Scene();modalScene.fog=new THREE.FogExp2(0x0A0808,0.05);
+  modalCamera=new THREE.PerspectiveCamera(42,w/h,0.1,100);modalCamera.position.set(0,0,5.5);
+  modalScene.add(new THREE.AmbientLight(0xffffff,0.35));
+  const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(3,5,4);modalScene.add(key);
+  const al=new THREE.PointLight(0xB5657A,3.5,8);al.position.set(-2,1,2);modalScene.add(al);
+  modalGroup=new THREE.Group();buildModalShape(modalGroup,shapeType);modalScene.add(modalGroup);
+  modalTY=0.4;modalTX=0.1;modalCY=0.4;modalCX=0.1;modalAuto=true;modalDrag=false;
+  function down(x,y){modalDrag=true;modalAuto=false;modalPrev={x,y}}
+  function move(x,y){if(!modalDrag)return;modalTY+=(x-modalPrev.x)*0.01;modalTX=Math.max(-0.5,Math.min(0.5,modalTX+(y-modalPrev.y)*0.006));modalPrev={x,y}}
+  function up(){modalDrag=false;setTimeout(()=>modalAuto=true,2500)}
+  canvas.onmousedown=e=>down(e.clientX,e.clientY);canvas.onmousemove=e=>move(e.clientX,e.clientY);
+  canvas.onmouseup=up;canvas.onmouseleave=up;
+  canvas.ontouchstart=e=>down(e.touches[0].clientX,e.touches[0].clientY);
+  canvas.ontouchmove=e=>move(e.touches[0].clientX,e.touches[0].clientY);canvas.ontouchend=up;
+  const clock=new THREE.Clock();
+  function animate(){modalAnimId=requestAnimationFrame(animate);const t=clock.getElapsedTime();
+    if(modalAuto&&!modalDrag)modalTY+=0.0045;
+    modalCY+=(modalTY-modalCY)*0.07;modalCX+=(modalTX-modalCX)*0.07;
+    modalGroup.rotation.y=modalCY;modalGroup.rotation.x=modalCX;
+    modalGroup.position.y=Math.sin(t*0.7)*0.08;
+    al.intensity=3+Math.sin(t*1.5)*1;
+    modalRenderer.render(modalScene,modalCamera);
+  }
+  animate();
+}
+function buildModalShape(group,type){
+  const roseMat=new THREE.MeshStandardMaterial({color:0xB5657A,metalness:0.15,roughness:0.4});
+  const roseMat2=new THREE.MeshStandardMaterial({color:0xD89AA8,metalness:0.15,roughness:0.4});
+  const glowMat=new THREE.MeshStandardMaterial({color:0xB5657A,emissive:0xB5657A,emissiveIntensity:0.7});
+  const leafMat=new THREE.MeshStandardMaterial({color:0x4A6B4E,metalness:0.1,roughness:0.5});
+  const goldMat=new THREE.MeshStandardMaterial({color:0xC9A96E,metalness:0.8,roughness:0.18});
+  const whiteMat=new THREE.MeshStandardMaterial({color:0xF2DCE1,metalness:0.05,roughness:0.5});
+  const potMat=new THREE.MeshStandardMaterial({color:0xEDE4DC,metalness:0.1,roughness:0.6});
+  const greenMat=new THREE.MeshStandardMaterial({color:0x3D5A40,metalness:0.1,roughness:0.5});
+  function flower(mat,size){const fg=new THREE.Group();for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;const p=new THREE.Mesh(new THREE.SphereGeometry(size*0.4,10,10),mat);p.scale.set(1,0.45,1.5);p.position.set(Math.cos(a)*size*0.45,0,Math.sin(a)*size*0.45);p.rotation.y=-a;fg.add(p);}fg.add(new THREE.Mesh(new THREE.SphereGeometry(size*0.26,14,14),goldMat));return fg;}
+  if(type==='bouquet'){
+    [[0,0.5,0,0.9,roseMat],[-0.7,0.1,0.2,0.7,roseMat2],[0.7,0.15,-0.15,0.75,roseMat],[-0.3,-0.5,0.4,0.6,roseMat2],[0.4,-0.4,-0.3,0.65,roseMat],[0,1.1,-0.2,0.5,roseMat2]].forEach(p=>{const f=flower(p[4],p[3]);f.position.set(p[0],p[1],p[2]);group.add(f);});
+    const wrap=new THREE.Mesh(new THREE.ConeGeometry(0.45,1,24,1,true),new THREE.MeshStandardMaterial({color:0xF2DCE1,side:THREE.DoubleSide,roughness:0.6}));wrap.position.y=-1.3;group.add(wrap);
+  } else if(type==='archway'){
+    const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-1.3,-1,0),new THREE.Vector3(-1.3,0.8,0),new THREE.Vector3(0,1.4,0),new THREE.Vector3(1.3,0.8,0),new THREE.Vector3(1.3,-1,0)]);
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.08,8,false),greenMat));
+    for(let i=0;i<10;i++){const t=i/9;const pt=curve.getPoint(t);const f=flower(i%2===0?roseMat:whiteMat,0.28);f.position.copy(pt);group.add(f);}
+  } else if(type==='wreath'){
+    for(let i=0;i<14;i++){const a=(i/14)*Math.PI*2;const f=flower(i%3===0?whiteMat:roseMat2,0.32);f.position.set(Math.cos(a)*1.1,Math.sin(a)*1.1,(Math.random()-0.5)*0.15);group.add(f);}
+    group.add(new THREE.Mesh(new THREE.TorusGeometry(1.1,0.12,10,32),greenMat));
+  } else if(type==='plant'){
+    const pot=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.38,0.7,20),potMat);pot.position.y=-0.9;group.add(pot);
+    for(let i=0;i<7;i++){const a=(i/7)*Math.PI*2;const leaf=new THREE.Mesh(new THREE.ConeGeometry(0.16,1.3,4),leafMat);leaf.position.set(Math.cos(a)*0.25,-0.2+Math.random()*0.3,Math.sin(a)*0.25);leaf.rotation.z=Math.PI;leaf.scale.set(0.7,1,0.35);group.add(leaf);}
+  } else if(type==='subscription'){
+    for(let i=0;i<3;i++){const box=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.5,0.9),new THREE.MeshStandardMaterial({color:0xEDE4DC,roughness:0.6}));box.position.set((i-1)*0.05,-1+i*0.55,(i-1)*-0.05);group.add(box);const f=flower(i%2===0?roseMat:roseMat2,0.5);f.position.set((i-1)*0.05,-0.55+i*0.55,(i-1)*-0.05);group.add(f);}
+    const ribbon=new THREE.Mesh(new THREE.TorusGeometry(0.15,0.025,8,20),goldMat);ribbon.position.set(0,-0.75,0.46);group.add(ribbon);
+  } else { group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1,0),roseMat)); }
+}
+</script>
+</body>
+</html>

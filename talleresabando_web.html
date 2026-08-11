@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talleres Abando — Mecánica General · Bilbao</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#0B0B0C; --steel:#F1F1EF; --white:#FFFFFF;
+  --amber:#C9762E; --amber2:#9C5A20; --amber3:#E0A05C;
+  --gray:#7A7A7C; --line:rgba(11,11,12,0.12);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--steel);color:var(--black);overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none;font-weight:400}
+a,button,select,input,textarea{cursor:none}
+.cursor-dot{position:fixed;width:8px;height:8px;background:var(--amber);border-radius:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%) rotate(45deg);transition:opacity .3s}
+.cursor-ring{position:fixed;width:30px;height:30px;border:1px solid rgba(201,118,46,0.5);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+.cursor-ring.hovering{width:60px;height:60px;border-color:var(--amber)}
+@media(pointer:coarse){.cursor-dot,.cursor-ring{display:none}body,a,button,select,input,textarea{cursor:auto}}
+.preloader{position:fixed;inset:0;background:var(--black);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s}
+.preloader.done{opacity:0;visibility:hidden}
+.pl-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,7vw,5rem);letter-spacing:6px;color:var(--white);overflow:hidden}
+.pl-name span{display:inline-block;transform:translateY(110%);animation:plUp .8s cubic-bezier(.16,1,.3,1) .1s forwards}
+.pl-sub{font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--amber3);margin-top:12px;font-family:monospace;opacity:0;animation:plFade .7s ease .6s forwards}
+@keyframes plUp{to{transform:translateY(0)}} @keyframes plFade{to{opacity:1}}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--amber);z-index:500;width:0%}
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 44px;height:70px;background:var(--black);border-bottom:2px solid var(--amber)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--white);text-decoration:none}
+.logo span{color:var(--amber3)}
+.nav-links{display:flex;gap:0;list-style:none}
+.nav-links a{font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;padding:0 22px;border-left:1px solid rgba(255,255,255,0.1);transition:color .3s,background .3s}
+.nav-links a:hover{color:var(--white);background:rgba(201,118,46,0.1)}
+.nav-book{font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--black);background:var(--amber);padding:0 26px;text-decoration:none;display:flex;align-items:center;height:70px;transition:background .3s}
+.nav-book:hover{background:var(--amber3)}
+
+/* HERO: technical spec / ticket style */
+.hero{min-height:100vh;background:var(--black);padding:150px 44px 80px;position:relative;overflow:hidden}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:5;margin-bottom:60px;flex-wrap:wrap;gap:20px}
+.hero-tag{font-family:monospace;font-size:0.72rem;color:var(--amber3);letter-spacing:1px;border:1px solid rgba(224,160,92,0.3);padding:8px 16px}
+.hero-title-block{position:relative;z-index:5;display:grid;grid-template-columns:1.2fr 0.8fr;gap:60px;align-items:end;margin-bottom:80px}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.2rem,8vw,7.5rem);letter-spacing:1px;color:var(--white);line-height:0.92}
+.h-title span{color:var(--amber3)}
+.hero-side{border-left:2px solid var(--amber);padding-left:28px}
+.h-sub{font-size:0.92rem;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:32px}
+.h-cta{display:inline-flex;align-items:center;gap:14px;background:var(--amber);color:var(--black);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;padding:16px 32px;text-decoration:none;font-weight:600;transition:background .3s}
+.h-cta:hover{background:var(--amber3)}
+.hero-3dwrap{position:relative;z-index:5;height:50vh;min-height:400px;border:1px solid rgba(255,255,255,0.1)}
+#canvas-ta{width:100%;height:100%;display:block}
+.hero-3dlabel{position:absolute;top:16px;left:16px;font-family:monospace;font-size:0.68rem;color:rgba(255,255,255,0.4);z-index:6}
+
+.marquee{background:var(--amber);padding:14px 0;overflow:hidden;white-space:nowrap}
+.marquee-track{display:inline-flex;animation:scroll 25s linear infinite}
+.mq-item{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;color:var(--black);padding:0 30px;display:inline-flex;align-items:center;gap:30px}
+.mq-item::after{content:'///';font-size:0.8rem;opacity:0.5}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* SERVICES: numbered spec table */
+.services{padding:120px 44px;background:var(--steel)}
+.sv-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:70px;flex-wrap:wrap;gap:20px;border-bottom:2px solid var(--black);padding-bottom:30px}
+.sv-tag{font-family:monospace;font-size:0.7rem;letter-spacing:1px;color:var(--amber2);margin-bottom:16px}
+.sv-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,5vw,4rem);letter-spacing:1px}
+.sv-title span{color:var(--amber2)}
+.sv-table{display:flex;flex-direction:column}
+.sv-row{display:grid;grid-template-columns:90px 1fr 100px;align-items:center;padding:34px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--black);transition:background .3s,padding .3s}
+.sv-row:hover{background:rgba(201,118,46,0.06);padding-left:16px}
+.sv-code{font-family:monospace;font-size:0.85rem;color:var(--amber2)}
+.sv-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,2.6vw,2.4rem);letter-spacing:0.5px}
+.sv-view{font-family:monospace;font-size:0.68rem;letter-spacing:1px;text-align:right;color:var(--gray);text-transform:uppercase}
+.sv-row:hover .sv-view{color:var(--amber2)}
+
+/* PROCESS: technical steps horizontal */
+.process{padding:120px 44px;background:var(--black)}
+.proc-header{margin-bottom:70px}
+.proc-tag{font-family:monospace;font-size:0.7rem;color:var(--amber3);margin-bottom:16px}
+.proc-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,5vw,4rem);color:var(--white)}
+.proc-title span{color:var(--amber3)}
+.proc-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,0.12);border-left:1px solid rgba(255,255,255,0.12)}
+.proc-cell{padding:44px 36px;border-right:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.12)}
+.proc-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--amber2)}
+.proc-name{font-size:1.1rem;color:var(--white);margin:14px 0 10px;font-weight:500}
+.proc-desc{font-size:0.8rem;color:rgba(255,255,255,0.4);line-height:1.7}
+
+/* TESTIMONIALS as ticket stubs */
+.testimonials{padding:120px 44px;background:var(--steel)}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--black)}
+.test-card{background:var(--steel);padding:36px 30px}
+.test-stars{font-family:monospace;color:var(--amber2);font-size:0.8rem;margin-bottom:16px;letter-spacing:2px}
+.test-text{font-size:0.92rem;line-height:1.6;margin-bottom:18px}
+.test-name{font-family:monospace;font-size:0.68rem;color:var(--gray);text-transform:uppercase}
+
+/* BOOKING as work order form */
+.booking{padding:120px 44px;background:var(--black)}
+.booking-inner{display:grid;grid-template-columns:0.9fr 1.1fr;gap:70px;border:1px solid rgba(255,255,255,0.15)}
+.booking-info-panel{padding:56px 44px;border-right:1px solid rgba(255,255,255,0.15)}
+.bk-tag{font-family:monospace;font-size:0.7rem;color:var(--amber3);margin-bottom:18px}
+.bk-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4.4vw,3.4rem);color:var(--white);line-height:1;margin-bottom:30px}
+.bk-title span{color:var(--amber3)}
+.avail-widget{display:flex;align-items:center;gap:12px;margin-bottom:36px;font-family:monospace;font-size:0.76rem}
+.avail-dot{width:8px;height:8px;background:#4ADE80;flex-shrink:0}
+.avail-text{color:rgba(255,255,255,0.6)}
+.avail-text strong{color:var(--white)}
+.bk-info-item{padding:16px 0;border-top:1px solid rgba(255,255,255,0.1);font-size:0.82rem;color:rgba(255,255,255,0.5)}
+.bk-info-item:last-child{border-bottom:1px solid rgba(255,255,255,0.1)}
+.bk-info-item strong{color:var(--white);display:block;margin-bottom:4px;font-weight:500}
+.booking-form-panel{padding:56px 44px}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--white);margin-bottom:30px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.form-group{margin-bottom:24px}
+.form-group label{display:block;font-family:monospace;font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px}
+.form-group input,.form-group select,.form-group textarea{width:100%;border:none;border-bottom:1px solid rgba(255,255,255,0.2);padding:10px 0;font-size:0.92rem;font-family:'Space Grotesk',sans-serif;color:var(--white);background:transparent;outline:none;transition:border-color .3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--amber)}
+.form-group select option{background:var(--black)}
+.form-group textarea{resize:none;height:70px}
+.btn-form{width:100%;background:var(--amber);color:var(--black);font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;padding:18px;border:none;font-weight:600;transition:background .3s}
+.btn-form:hover{background:var(--amber3)}
+
+footer{padding:44px;background:var(--black);border-top:2px solid var(--amber);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--white);letter-spacing:1px}
+.footer-copy{font-family:monospace;font-size:0.66rem;color:rgba(255,255,255,0.3)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(5,5,5,0.94);z-index:2000;opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;display:flex;align-items:center;justify-content:center;padding:36px;cursor:auto}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal-box{background:#111011;width:100%;max-width:960px;max-height:88vh;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(255,255,255,0.15);transform:scale(0.96);transition:transform .4s}
+.modal-overlay.open .modal-box{transform:scale(1)}
+.modal-close{position:absolute;top:20px;right:20px;z-index:20;width:38px;height:38px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--black)}
+.modal-close svg path{stroke:rgba(255,255,255,0.7)}
+.modal-visual{position:relative;background:#0A0909;min-height:320px}
+.modal-visual canvas{position:absolute;inset:0}
+.modal-content{padding:52px}
+.modal-eyebrow{font-family:monospace;font-size:0.66rem;letter-spacing:1px;color:var(--amber3);margin-bottom:18px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--white);line-height:1;margin-bottom:22px}
+.modal-title span{color:var(--amber3)}
+.modal-desc{font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.5);margin-bottom:28px}
+.modal-features{margin-bottom:32px}
+.mf-item{display:flex;gap:14px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.08);font-size:0.82rem;color:rgba(255,255,255,0.55)}
+.mf-item strong{color:#fff;font-weight:600}
+.mf-dot{width:6px;height:6px;background:var(--amber3);flex-shrink:0;margin-top:6px}
+.modal-cta{display:inline-block;background:var(--amber);color:#000;font-family:monospace;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;padding:16px 32px;text-decoration:none;font-weight:700}
+body.modal-lock{overflow:hidden}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:900px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .hero{padding:110px 20px 60px}.hero-title-block{grid-template-columns:1fr;gap:30px}
+  .services{padding:70px 20px}.sv-row{grid-template-columns:50px 1fr;gap:12px}.sv-view{display:none}
+  .process{padding:70px 20px}.proc-grid{grid-template-columns:1fr}
+  .testimonials{padding:70px 20px}.test-grid{grid-template-columns:1fr}
+  .booking{padding:70px 20px}.booking-inner{grid-template-columns:1fr}.booking-info-panel{border-right:none;border-bottom:1px solid rgba(255,255,255,0.15)}
+  .form-row{grid-template-columns:1fr}
+  footer{padding:30px 20px}
+  .modal-box{grid-template-columns:1fr}.modal-visual{min-height:200px}.modal-content{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+<div class="cursor-dot" id="cDot"></div>
+<div class="cursor-ring" id="cRing"></div>
+<div class="preloader" id="preloader">
+  <div style="text-align:center">
+    <div class="pl-name"><span>ABANDO</span></div>
+    <div class="pl-sub">// TALLER MECÁNICO — BILBAO</div>
+  </div>
+</div>
+<div class="progress" id="progress"></div>
+<nav id="nav">
+  <a href="#" class="logo">TALLERES <span>ABANDO</span></a>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#reservar">Cita</a></li>
+  </ul>
+  <a href="#reservar" class="nav-book">Pedir cita →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-top">
+    <div class="hero-tag">EST. 2008 — ABANDO, BILBAO</div>
+    <div class="hero-tag">★ 4.7 · 68 VALORACIONES</div>
+  </div>
+  <div class="hero-title-block">
+    <h1 class="h-title">TU COCHE<br>EN MANOS DE<br><span>CONFIANZA.</span></h1>
+    <div class="hero-side">
+      <p class="h-sub">Más de 15 años reparando coches y furgonetas en Bilbao. Precio cerrado antes de tocar el vehículo, sin sorpresas al recoger.</p>
+      <a href="#reservar" class="h-cta">Pedir cita →</a>
+    </div>
+  </div>
+  <div class="hero-3dwrap">
+    <div class="hero-3dlabel">// ROTAR — ARRASTRAR</div>
+    <canvas id="canvas-ta"></canvas>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="mq-item">Mecánica general</span><span class="mq-item">Pre-ITV</span><span class="mq-item">Frenos</span><span class="mq-item">Chapa y pintura</span><span class="mq-item">Aire acondicionado</span>
+    <span class="mq-item">Mecánica general</span><span class="mq-item">Pre-ITV</span><span class="mq-item">Frenos</span><span class="mq-item">Chapa y pintura</span><span class="mq-item">Aire acondicionado</span>
+  </div>
+</div>
+
+<section class="services" id="servicios">
+  <div class="sv-header">
+    <div>
+      <div class="sv-tag">// LISTA DE SERVICIOS</div>
+      <h2 class="sv-title">LO QUE HACEMOS <span>POR TU COCHE.</span></h2>
+    </div>
+  </div>
+  <div class="sv-table">
+    <a href="#reservar" class="sv-row reveal" data-modal="mecanica"><span class="sv-code">01 /</span><span class="sv-name">MECÁNICA GENERAL</span><span class="sv-view">VER DETALLE →</span></a>
+    <a href="#reservar" class="sv-row reveal" data-modal="itv"><span class="sv-code">02 /</span><span class="sv-name">PRE-ITV</span><span class="sv-view">VER DETALLE →</span></a>
+    <a href="#reservar" class="sv-row reveal" data-modal="frenos"><span class="sv-code">03 /</span><span class="sv-name">FRENOS Y SUSPENSIÓN</span><span class="sv-view">VER DETALLE →</span></a>
+    <a href="#reservar" class="sv-row reveal" data-modal="chapa"><span class="sv-code">04 /</span><span class="sv-name">CHAPA Y PINTURA</span><span class="sv-view">VER DETALLE →</span></a>
+    <a href="#reservar" class="sv-row reveal" data-modal="aire"><span class="sv-code">05 /</span><span class="sv-name">AIRE ACONDICIONADO</span><span class="sv-view">VER DETALLE →</span></a>
+  </div>
+</section>
+
+<section class="process" id="proceso">
+  <div class="proc-header">
+    <div class="proc-tag">// CÓMO TRABAJAMOS</div>
+    <h2 class="proc-title">SIN LÍOS, <span>SIN SORPRESAS.</span></h2>
+  </div>
+  <div class="proc-grid">
+    <div class="proc-cell reveal"><div class="proc-num">01</div><div class="proc-name">Diagnóstico</div><p class="proc-desc">Revisamos el vehículo y te explicamos qué tiene, sin tecnicismos innecesarios.</p></div>
+    <div class="proc-cell reveal"><div class="proc-num">02</div><div class="proc-name">Presupuesto cerrado</div><p class="proc-desc">Te damos el precio antes de empezar — sin sorpresas al recoger el coche.</p></div>
+    <div class="proc-cell reveal"><div class="proc-num">03</div><div class="proc-name">Reparación</div><p class="proc-desc">Trabajo con calma y recambios de calidad, listo cuando te lo prometemos.</p></div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="sv-tag reveal" style="margin-bottom:16px">// LO QUE DICEN NUESTROS CLIENTES</div>
+  <div class="test-grid">
+    <div class="test-card reveal"><div class="test-stars">★★★★★</div><p class="test-text">"Excelentes y confiables profesionales. Rápidos, eficientes y con precios razonables."</p><span class="test-name">CLIENTE BILBAO</span></div>
+    <div class="test-card reveal"><div class="test-stars">★★★★★</div><p class="test-text">"Trabajan muy rápido, con mucha honestidad y precios muy justos. Sigo trayendo mi coche."</p><span class="test-name">CLIENTE HABITUAL</span></div>
+    <div class="test-card reveal"><div class="test-stars">★★★★★</div><p class="test-text">"Buen trato, profesionales, rapidez, buen trabajo y precio justo. Recomendable."</p><span class="test-name">CLIENTE ABANDO</span></div>
+  </div>
+</section>
+
+<section class="booking" id="reservar">
+  <div class="booking-inner">
+    <div class="booking-info-panel">
+      <div class="bk-tag reveal">// PEDIR CITA</div>
+      <h2 class="bk-title reveal">TU COCHE,<br>LISTO EN <span>DÍAS.</span></h2>
+      <div class="avail-widget reveal"><span class="avail-dot"></span><span class="avail-text">Quedan <strong>3 huecos</strong> esta semana</span></div>
+      <div class="bk-info-item reveal"><strong>WhatsApp</strong>Confirmación en menos de 2 horas</div>
+      <div class="bk-info-item reveal"><strong>Egia Jeneralaren Kalea, 18</strong>48010 Bilbao · Abando</div>
+      <div class="bk-info-item reveal"><strong>944 27 05 50</strong>Lunes a viernes, 8:00–19:00</div>
+    </div>
+    <div class="booking-form-panel reveal">
+      <h3 class="form-title">PEDIR CITA</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" placeholder="600 000 000"></div>
+      </div>
+      <div class="form-group"><label>Servicio</label><select><option value="">Selecciona</option><option>Mecánica general</option><option>Pre-ITV</option><option>Frenos y suspensión</option><option>Chapa y pintura</option><option>Aire acondicionado</option></select></div>
+      <div class="form-group"><label>Fecha preferida</label><input type="date"></div>
+      <div class="form-group"><label>Mensaje</label><textarea placeholder="Cuéntanos qué le pasa a tu coche..."></textarea></div>
+      <button class="btn-form">Enviar solicitud</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">TALLERES ABANDO</div>
+  <div class="footer-copy">© 2026 — EGIA JENERALAREN K. 18, BILBAO</div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+    <div class="modal-visual"><canvas id="modalCanvas"></canvas></div>
+    <div class="modal-content">
+      <div class="modal-eyebrow" id="modalEyebrow"></div>
+      <h3 class="modal-title" id="modalTitle"></h3>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div class="modal-features" id="modalFeatures"></div>
+      <a href="#reservar" class="modal-cta">PEDIR CITA →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('preloader').classList.add('done'),1200);});
+const cDot=document.getElementById('cDot'),cRing=document.getElementById('cRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cDot.style.left=mx+'px';cDot.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*0.16;ry+=(my-ry)*0.16;cRing.style.left=rx+'px';cRing.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,select,input,textarea').forEach(el=>{el.addEventListener('mouseenter',()=>cRing.classList.add('hovering'));el.addEventListener('mouseleave',()=>cRing.classList.remove('hovering'));});
+const progress=document.getElementById('progress');
+window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-window.innerHeight;progress.style.width=(window.scrollY/h*100)+'%';});
+document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1}).observe(el));
+
+// HERO 3D: engine gear assembly in a bordered box (not full bleed)
+(function(){
+const canvas=document.getElementById('canvas-ta');const container=canvas.parentElement;
+function size(){return{w:container.clientWidth,h:container.clientHeight}}
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+let s=size();renderer.setSize(s.w,s.h);renderer.setClearColor(0x0A0909,1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0A0909,0.03);
+const camera=new THREE.PerspectiveCamera(40,s.w/s.h,0.1,100);camera.position.set(0,0,6.5);
+scene.add(new THREE.AmbientLight(0xffffff,0.35));
+const key=new THREE.DirectionalLight(0xffffff,2.3);key.position.set(4,6,4);scene.add(key);
+const amberLight=new THREE.PointLight(0xC9762E,3.4,9);amberLight.position.set(-2.6,1,2.5);scene.add(amberLight);
+const chromeMat=new THREE.MeshStandardMaterial({color:0xDEDEDC,metalness:0.9,roughness:0.15});
+const darkMat=new THREE.MeshStandardMaterial({color:0x1E1E1E,metalness:0.7,roughness:0.3});
+const amberMat=new THREE.MeshStandardMaterial({color:0xC9762E,metalness:0.6,roughness:0.25});
+const glowMat=new THREE.MeshStandardMaterial({color:0xE0A05C,emissive:0xE0A05C,emissiveIntensity:0.7});
+function makeGear(radius,teeth,thickness,mat){const gg=new THREE.Group();const body=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,thickness,32),mat);body.rotation.x=Math.PI/2;gg.add(body);for(let i=0;i<teeth;i++){const a=(i/teeth)*Math.PI*2;const tooth=new THREE.Mesh(new THREE.BoxGeometry(radius*0.18,thickness,radius*0.22),mat);tooth.position.set(Math.cos(a)*(radius+radius*0.09),0,Math.sin(a)*(radius+radius*0.09));tooth.rotation.y=-a;gg.add(tooth);}return gg;}
+const g=new THREE.Group();
+const gear1=makeGear(0.9,12,0.22,chromeMat);gear1.position.set(-0.5,0.3,0);g.add(gear1);
+const gear2=makeGear(0.6,9,0.22,amberMat);gear2.position.set(0.75,-0.15,0.1);g.add(gear2);
+const gear3=makeGear(0.42,7,0.22,darkMat);gear3.position.set(0.1,-0.9,-0.1);g.add(gear3);
+for(let i=0;i<3;i++){const bolt=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.1,6),glowMat);const a=(i/3)*Math.PI*2;bolt.position.set(Math.cos(a)*1.5,Math.sin(a)*1.5,0.3);g.add(bolt);}
+g.position.set(0,0,0);g.rotation.y=0.35;scene.add(g);
+let drag=false,prev={x:0,y:0},tY=0.35,tX=0,cY=0.35,cX=0,auto=true;
+function down(x,y){drag=true;auto=false;prev={x,y};}
+function move(x,y){if(!drag)return;tY+=(x-prev.x)*0.008;tX=Math.max(-.4,Math.min(.4,tX+(y-prev.y)*0.005));prev={x,y};}
+function up(){drag=false;setTimeout(()=>auto=true,3000);}
+canvas.addEventListener('mousedown',e=>down(e.clientX,e.clientY));
+canvas.addEventListener('mousemove',e=>move(e.clientX,e.clientY));
+canvas.addEventListener('mouseup',up);canvas.addEventListener('mouseleave',up);
+canvas.addEventListener('touchstart',e=>down(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+canvas.addEventListener('touchmove',e=>move(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+canvas.addEventListener('touchend',up);
+window.addEventListener('resize',()=>{s=size();camera.aspect=s.w/s.h;camera.updateProjectionMatrix();renderer.setSize(s.w,s.h);});
+const clock=new THREE.Clock();
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();
+  if(auto&&!drag)tY+=0.0028;cY+=(tY-cY)*0.06;cX+=(tX-cX)*0.06;
+  g.rotation.y=cY;g.rotation.x=cX;
+  gear1.rotation.z+=0.01;gear2.rotation.z-=0.013;gear3.rotation.z+=0.017;
+  amberLight.intensity=3+Math.sin(t*1.3)*0.9;
+  renderer.render(scene,camera);
+}
+animate();
+})();
+
+const SITE_DATA={
+  'mecanica':{eyebrow:'// MECÁNICA GENERAL',title:'REPARAMOS <span>DE TODO, BIEN.</span>',desc:'Diagnóstico y reparación de averías mecánicas de cualquier marca y modelo, con recambios de calidad y garantía en el trabajo.',features:['<strong>Todas las marcas</strong> y modelos','Recambios de <strong>calidad garantizada</strong>','Diagnóstico <strong>honesto</strong>, sin inventos'],shape:'engine'},
+  'itv':{eyebrow:'// PRE-ITV',title:'PASA LA ITV <span>SIN SUSTOS.</span>',desc:'Revisión completa de los puntos críticos antes de la inspección técnica, para llegar con tranquilidad.',features:['Revisión de <strong>puntos críticos</strong>','Ajustes <strong>antes de la inspección</strong>','Menos <strong>sorpresas</strong> el día de la ITV'],shape:'inspection'},
+  'frenos':{eyebrow:'// FRENOS Y SUSPENSIÓN',title:'SEGURIDAD QUE <span>SE SIENTE.</span>',desc:'Cambio de pastillas, discos y amortiguadores con piezas de primera calidad.',features:['Pastillas y <strong>discos de calidad</strong>','Amortiguadores <strong>de primeras marcas</strong>','Revisión de <strong>todo el sistema</strong>'],shape:'brake'},
+  'chapa':{eyebrow:'// CHAPA Y PINTURA',title:'COMO SI NUNCA <span>HUBIERA PASADO.</span>',desc:'Reparación de golpes y pintura al horno con acabado idéntico al color original de fábrica.',features:['Secado <strong>al horno</strong>','Acabado <strong>idéntico al original</strong>','Trabajo con <strong>aseguradoras</strong>'],shape:'paint'},
+  'aire':{eyebrow:'// AIRE ACONDICIONADO',title:'FRÍO DE VERDAD <span>EN VERANO.</span>',desc:'Carga de gas y revisión completa del sistema de climatización.',features:['<strong>Carga de gas</strong> completa','Revisión de <strong>fugas</strong>','Listo para el <strong>verano</strong>'],shape:'ac'}
+};
+const modalOverlay=document.getElementById('modalOverlay'),modalClose=document.getElementById('modalClose');
+let modalRenderer,modalScene,modalCamera,modalGroup,modalAnimId,modalAuto=true,modalDrag=false,modalPrev={x:0,y:0},modalTY=0.4,modalTX=0.1,modalCY=0.4,modalCX=0.1;
+function openModal(key){const d=SITE_DATA[key];if(!d)return;
+  document.getElementById('modalEyebrow').textContent=d.eyebrow;
+  document.getElementById('modalTitle').innerHTML=d.title;
+  document.getElementById('modalDesc').textContent=d.desc;
+  document.getElementById('modalFeatures').innerHTML=d.features.map(f=>'<div class="mf-item"><span class="mf-dot"></span><span>'+f+'</span></div>').join('');
+  modalOverlay.classList.add('open');document.body.classList.add('modal-lock');
+  requestAnimationFrame(()=>initModal3D(d.shape));
+}
+function closeModal(){modalOverlay.classList.remove('open');document.body.classList.remove('modal-lock');if(modalAnimId)cancelAnimationFrame(modalAnimId);if(modalRenderer){modalRenderer.dispose();modalRenderer=null;}}
+modalClose.addEventListener('click',closeModal);
+modalOverlay.addEventListener('click',e=>{if(e.target===modalOverlay)closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.querySelectorAll('[data-modal]').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();openModal(el.getAttribute('data-modal'));});});
+function initModal3D(shapeType){
+  const canvas=document.getElementById('modalCanvas'),container=canvas.parentElement;
+  const w=container.clientWidth,h=container.clientHeight;
+  modalRenderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  modalRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));modalRenderer.setSize(w,h);
+  modalRenderer.setClearColor(0x0A0909,1);
+  modalScene=new THREE.Scene();modalScene.fog=new THREE.FogExp2(0x0A0909,0.05);
+  modalCamera=new THREE.PerspectiveCamera(42,w/h,0.1,100);modalCamera.position.set(0,0,5.5);
+  modalScene.add(new THREE.AmbientLight(0xffffff,0.35));
+  const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(3,5,4);modalScene.add(key);
+  const al=new THREE.PointLight(0xC9762E,3.5,8);al.position.set(-2,1,2);modalScene.add(al);
+  modalGroup=new THREE.Group();buildModalShape(modalGroup,shapeType);modalScene.add(modalGroup);
+  modalTY=0.4;modalTX=0.1;modalCY=0.4;modalCX=0.1;modalAuto=true;modalDrag=false;
+  function down(x,y){modalDrag=true;modalAuto=false;modalPrev={x,y}}
+  function move(x,y){if(!modalDrag)return;modalTY+=(x-modalPrev.x)*0.01;modalTX=Math.max(-0.5,Math.min(0.5,modalTX+(y-modalPrev.y)*0.006));modalPrev={x,y}}
+  function up(){modalDrag=false;setTimeout(()=>modalAuto=true,2500)}
+  canvas.onmousedown=e=>down(e.clientX,e.clientY);canvas.onmousemove=e=>move(e.clientX,e.clientY);
+  canvas.onmouseup=up;canvas.onmouseleave=up;
+  canvas.ontouchstart=e=>down(e.touches[0].clientX,e.touches[0].clientY);
+  canvas.ontouchmove=e=>move(e.touches[0].clientX,e.touches[0].clientY);canvas.ontouchend=up;
+  const clock=new THREE.Clock();
+  function animate(){modalAnimId=requestAnimationFrame(animate);const t=clock.getElapsedTime();
+    if(modalAuto&&!modalDrag)modalTY+=0.0045;
+    modalCY+=(modalTY-modalCY)*0.07;modalCX+=(modalTX-modalCX)*0.07;
+    modalGroup.rotation.y=modalCY;modalGroup.rotation.x=modalCX;
+    modalGroup.position.y=Math.sin(t*0.7)*0.08;al.intensity=3+Math.sin(t*1.5)*1;
+    modalRenderer.render(modalScene,modalCamera);
+  }
+  animate();
+}
+function buildModalShape(group,type){
+  const chromeMat=new THREE.MeshStandardMaterial({color:0xDEDEDC,metalness:0.9,roughness:0.15});
+  const darkMat=new THREE.MeshStandardMaterial({color:0x1E1E1E,metalness:0.7,roughness:0.3});
+  const amberMat=new THREE.MeshStandardMaterial({color:0xC9762E,metalness:0.6,roughness:0.25});
+  const glowMat=new THREE.MeshStandardMaterial({color:0xE0A05C,emissive:0xE0A05C,emissiveIntensity:0.85});
+  const whiteMat=new THREE.MeshStandardMaterial({color:0xF0EFEC,metalness:0.3,roughness:0.35});
+  const redMat=new THREE.MeshStandardMaterial({color:0xB5432E,metalness:0.5,roughness:0.3});
+  if(type==='engine'){
+    group.add(new THREE.Mesh(new THREE.BoxGeometry(1.2,1,0.9),darkMat));
+    for(let i=0;i<4;i++){const piston=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.5,16),chromeMat);piston.position.set(-0.45+i*0.3,0.6,0);group.add(piston);}
+    const cap=new THREE.Mesh(new THREE.BoxGeometry(1.3,0.15,1),amberMat);cap.position.y=0.9;group.add(cap);
+  } else if(type==='inspection'){
+    group.add(new THREE.Mesh(new THREE.BoxGeometry(0.9,1.2,0.06),whiteMat));
+    const clip=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.12,0.1),darkMat);clip.position.y=0.62;group.add(clip);
+    for(let i=0;i<4;i++){const line=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.03,0.02),darkMat);line.position.set(0,0.3-i*0.2,0.04);group.add(line);}
+    const check=new THREE.Mesh(new THREE.TorusGeometry(0.18,0.03,8,24,Math.PI*1.3),glowMat);check.position.set(0.15,-0.55,0.06);check.rotation.z=-0.5;group.add(check);
+  } else if(type==='brake'){
+    const disc=new THREE.Mesh(new THREE.CylinderGeometry(0.75,0.75,0.06,32),chromeMat);disc.rotation.x=Math.PI/2;group.add(disc);
+    for(let i=0;i<16;i++){const a=(i/16)*Math.PI*2;const vent=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.06,0.15),darkMat);vent.position.set(Math.cos(a)*0.55,0,Math.sin(a)*0.55);vent.rotation.y=-a;group.add(vent);}
+    const caliper=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.4,0.2),redMat);caliper.position.set(0.55,0.3,0.04);group.add(caliper);
+  } else if(type==='paint'){
+    group.add(new THREE.Mesh(new THREE.BoxGeometry(1.4,0.9,0.08),new THREE.MeshStandardMaterial({color:0xB5432E,metalness:0.7,roughness:0.1})));
+    const spray=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,0.4,12),chromeMat);spray.position.set(-1,0,0.5);spray.rotation.z=0.6;group.add(spray);
+    for(let i=0;i<8;i++){const drop=new THREE.Mesh(new THREE.SphereGeometry(0.02,8,8),glowMat);drop.position.set(-0.6+Math.random()*0.4,(Math.random()-0.5)*0.3,0.55+Math.random()*0.1);group.add(drop);}
+  } else if(type==='ac'){
+    group.add(new THREE.Mesh(new THREE.BoxGeometry(1.1,0.6,0.6),whiteMat));
+    for(let i=0;i<5;i++){const slat=new THREE.Mesh(new THREE.BoxGeometry(0.9,0.03,0.02),darkMat);slat.position.set(0,0.2-i*0.1,0.32);group.add(slat);}
+    for(let i=0;i<3;i++){const wave=new THREE.Mesh(new THREE.TorusGeometry(0.5+i*0.2,0.015,6,32,Math.PI*0.6),glowMat);wave.rotation.x=Math.PI/2;wave.position.set(0,0,0.5+i*0.1);group.add(wave);}
+  } else { group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1,0),amberMat)); }
+}
+</script>
+</body>
+</html>

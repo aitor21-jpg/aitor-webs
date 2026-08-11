@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Academia Muzzik · Bilbao</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#0F0E13;--white:#FFF;--ivory:#F2F0F5;--violet:#7C5FB0;--violet2:#5A4380;--violet3:#A98FD1;--gray:#807A88;--line:rgba(15,14,19,0.1)}
+body{font-family:'Space Grotesk',sans-serif;background:var(--ivory);color:var(--black);overflow-x:hidden;font-weight:400;font-size:16px}
+a{color:inherit;text-decoration:none}
+.preloader{position:fixed;inset:0;background:var(--black);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
+.preloader.done{opacity:0;visibility:hidden}
+.pl-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,9vw,2.8rem);letter-spacing:2px;color:var(--white);text-align:center;padding:0 20px}
+.pl-sub{font-family:monospace;font-size:0.65rem;letter-spacing:2px;color:var(--violet3);margin-top:10px}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--violet);z-index:500;width:0%}
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:58px;background:var(--black);border-bottom:2px solid var(--violet)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--white);letter-spacing:1px}
+.logo span{color:var(--violet3)}
+.nav-book{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;background:var(--violet);color:var(--white);padding:9px 16px;font-weight:600}
+
+.hero{min-height:86vh;background:var(--black);padding:88px 20px 40px;position:relative;overflow:hidden}
+.hero-grid-bg{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(124,95,176,0.15) 1px,transparent 1px);background-size:24px 24px}
+.hero-tag{font-family:monospace;font-size:0.62rem;color:var(--violet3);letter-spacing:1px;border:1px solid rgba(169,143,209,0.3);padding:6px 12px;display:inline-block;margin-bottom:22px;position:relative;z-index:5}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,11vw,3.2rem);letter-spacing:0.5px;color:var(--white);line-height:0.98;position:relative;z-index:5;margin-bottom:18px}
+.h-title span{color:var(--violet3)}
+.h-sub{font-size:0.88rem;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:26px;position:relative;z-index:5;max-width:400px}
+.h-cta{display:block;background:var(--violet);color:var(--white);font-size:0.76rem;letter-spacing:1px;text-transform:uppercase;padding:16px;text-align:center;font-weight:600;position:relative;z-index:5}
+.hero-3dwrap{position:relative;z-index:5;height:32vh;min-height:220px;margin-top:26px;border:1px solid rgba(255,255,255,0.1)}
+#canvas-mus{width:100%;height:100%;display:block}
+
+.marquee{background:var(--violet);padding:12px 0;overflow:hidden;white-space:nowrap}
+.marquee-track{display:inline-flex;animation:scroll 20s linear infinite}
+.mq-item{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:1px;color:var(--white);padding:0 20px}
+.mq-item::after{content:'♪';margin-left:20px;opacity:0.6}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+.services{padding:44px 20px;background:var(--ivory)}
+.sv-tag{font-family:monospace;font-size:0.62rem;letter-spacing:1px;color:var(--violet2);margin-bottom:14px}
+.sv-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,8vw,2.4rem);margin-bottom:24px}
+.sv-title span{color:var(--violet2)}
+.sv-row{display:flex;align-items:center;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+.sv-name{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.5px;flex:1}
+
+.about{padding:44px 20px;background:var(--black)}
+.about .sv-tag{color:var(--violet3)}
+.about-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,8vw,2.4rem);color:var(--white);margin-bottom:16px}
+.about-title span{color:var(--violet3)}
+.about-body{font-size:0.88rem;color:rgba(255,255,255,0.55);line-height:1.7}
+
+.booking{padding:44px 20px;background:var(--ivory)}
+.bk-tag{font-family:monospace;font-size:0.62rem;letter-spacing:1px;color:var(--violet2);margin-bottom:14px}
+.bk-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,8vw,2.4rem);margin-bottom:22px}
+.bk-title span{color:var(--violet2)}
+.avail{display:flex;align-items:center;gap:10px;margin-bottom:22px;background:var(--white);padding:12px 16px;border:1px solid var(--line)}
+.avail-dot{width:7px;height:7px;background:#3FA968}
+.avail-text{font-size:0.78rem;color:var(--gray)}
+.avail-text strong{color:var(--black)}
+.bk-item{padding:14px 0;border-top:1px solid var(--line);font-size:0.85rem;color:var(--gray)}
+.bk-item:last-child{border-bottom:1px solid var(--line)}
+.bk-item strong{color:var(--black);display:block;margin-bottom:3px}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;margin:26px 0 18px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-family:monospace;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+.form-group input,.form-group select{width:100%;border:none;border-bottom:1px solid var(--line);padding:11px 0;font-size:1rem;font-family:'Space Grotesk',sans-serif;color:var(--black);background:transparent;outline:none}
+.btn-form{width:100%;background:var(--violet);color:var(--white);font-size:0.76rem;letter-spacing:1px;text-transform:uppercase;padding:16px;border:none;margin-top:6px;font-weight:600}
+
+footer{padding:26px 20px;background:var(--black);border-top:2px solid var(--violet);text-align:center}
+.footer-logo{font-family:'Bebas Neue',sans-serif;color:var(--white);font-size:1.05rem}
+.footer-copy{font-family:monospace;font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:6px}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(min-width:640px){.hero,.services,.about,.booking{padding-left:40px;padding-right:40px}nav{padding:0 40px}}
+@media(min-width:900px){
+  nav{padding:0 56px}
+  .hero{padding:0 56px}
+  .services,.about,.booking{padding:80px 56px}
+  .booking{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+}
+</style>
+</head>
+<body>
+<div class="preloader" id="preloader">
+  <div><div class="pl-name">ACADEMIA MÚSICA</div><div class="pl-sub">// BILBAO</div></div>
+</div>
+<div class="progress" id="progress"></div>
+<nav>
+  <a href="#" class="logo">MUZZIK<span>MÚSICA</span></a>
+  <a href="#reservar" class="nav-book">Inscribirse →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-tag">// CLASES PARA TODAS LAS EDADES</div>
+  <h1 class="h-title">APRENDE A<br><span>TOCAR DE VERDAD.</span></h1>
+  <p class="h-sub">Clases de guitarra, piano, batería y canto — grupos reducidos, profesores con experiencia real.</p>
+  <a href="#reservar" class="h-cta">Reservar clase de prueba →</a>
+  <div class="hero-3dwrap"><canvas id="canvas-mus"></canvas></div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="mq-item">Guitarra</span><span class="mq-item">Piano</span><span class="mq-item">Batería</span><span class="mq-item">Canto</span><span class="mq-item">Bajo</span>
+    <span class="mq-item">Guitarra</span><span class="mq-item">Piano</span><span class="mq-item">Batería</span><span class="mq-item">Canto</span><span class="mq-item">Bajo</span>
+  </div>
+</div>
+
+<section class="services">
+  <div class="sv-tag">// INSTRUMENTOS</div>
+  <h2 class="sv-title">QUÉ PUEDES <span>APRENDER.</span></h2>
+  <div class="sv-row"><span class="sv-name">GUITARRA</span></div>
+  <div class="sv-row"><span class="sv-name">PIANO</span></div>
+  <div class="sv-row"><span class="sv-name">BATERÍA</span></div>
+  <div class="sv-row"><span class="sv-name">CANTO</span></div>
+</section>
+
+<section class="about">
+  <div class="sv-tag">// SOBRE NOSOTROS</div>
+  <h2 class="about-title">CLASES QUE <span>ENGANCHAN.</span></h2>
+  <p class="about-body">Grupos reducidos, metodología dinámica y profesores apasionados por la música — así se aprende de verdad, no memorizando escalas sin sentido.</p>
+</section>
+
+<section class="booking" id="reservar">
+  <div class="bk-tag">// RESERVAR</div>
+  <h2 class="bk-title">TU CLASE DE<br><span>PRUEBA, YA.</span></h2>
+  <div class="avail"><span class="avail-dot"></span><span class="avail-text">Plazas <strong>este mes</strong></span></div>
+  <div class="bk-item"><strong>WhatsApp</strong>Respuesta en menos de 24h</div>
+  <div class="bk-item"><strong>Todas las edades</strong>Niños y adultos</div>
+  <h3 class="form-title">RESERVAR CLASE</h3>
+  <div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+  <div class="form-group"><label>Teléfono</label><input type="tel" placeholder="600 000 000"></div>
+  <div class="form-group"><label>Instrumento</label><select><option value="">Selecciona</option><option>Guitarra</option><option>Piano</option><option>Batería</option><option>Canto</option></select></div>
+  <button class="btn-form">Enviar solicitud</button>
+</section>
+
+<footer>
+  <div class="footer-logo">ACADEMIA MÚSICA</div>
+  <div class="footer-copy">© 2026 — BILBAO</div>
+</footer>
+
+<script>
+window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('preloader').classList.add('done'),900);});
+const progress=document.getElementById('progress');
+window.addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-window.innerHeight;progress.style.width=(window.scrollY/h*100)+'%';});
+document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1}).observe(el));
+
+(function(){
+const canvas=document.getElementById('canvas-mus');const container=canvas.parentElement;
+function size(){return{w:container.clientWidth,h:container.clientHeight}}
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+let s=size();renderer.setSize(s.w,s.h);renderer.setClearColor(0x0A0912,1);
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0A0912,0.03);
+const camera=new THREE.PerspectiveCamera(42,s.w/s.h,0.1,100);camera.position.set(0,0,6.5);
+scene.add(new THREE.AmbientLight(0xffffff,0.35));
+const key=new THREE.DirectionalLight(0xffffff,2.3);key.position.set(4,6,4);scene.add(key);
+const violetLight=new THREE.PointLight(0x7C5FB0,3.4,9);violetLight.position.set(-2.6,1,2.5);scene.add(violetLight);
+const woodMat=new THREE.MeshStandardMaterial({color:0x7C5FB0,metalness:0.3,roughness:0.4});
+const darkMat=new THREE.MeshStandardMaterial({color:0x1A1720,metalness:0.6,roughness:0.35});
+const g=new THREE.Group();
+// stylized guitar body
+const body=new THREE.Mesh(new THREE.CylinderGeometry(0.85,0.85,0.25,32),woodMat);
+body.scale.set(1,1,0.7);g.add(body);
+const neck=new THREE.Mesh(new THREE.BoxGeometry(0.18,1.6,0.1),darkMat);
+neck.position.set(0,1.1,0);g.add(neck);
+const head=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.3,0.08),darkMat);
+head.position.set(0,1.95,0);g.add(head);
+for(let i=0;i<6;i++){const string=new THREE.Mesh(new THREE.CylinderGeometry(0.006,0.006,2.4,6),new THREE.MeshBasicMaterial({color:0xD8D8D8}));
+string.position.set(-0.06+i*0.024,0.9,0.06);g.add(string);}
+g.rotation.z=0.15;g.rotation.y=0.3;
+scene.add(g);
+window.addEventListener('resize',()=>{s=size();camera.aspect=s.w/s.h;camera.updateProjectionMatrix();renderer.setSize(s.w,s.h);});
+const clock=new THREE.Clock();
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();
+  g.rotation.y=0.3+t*0.18;
+  violetLight.intensity=3+Math.sin(t*1.5)*0.9;
+  renderer.render(scene,camera);
+}
+animate();
+})();
+</script>
+</body>
+</html>

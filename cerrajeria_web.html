@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cerrajería · Bilbao</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#111213;--white:#FFF;--steel:#EFEFEF;--red:#B8402E;--red2:#8A2F22;--red3:#DE7E6C;--gray:#75767A;--line:rgba(17,18,19,0.12)}
+body{font-family:'Space Grotesk',sans-serif;background:var(--steel);color:var(--black);overflow-x:hidden;font-weight:400;font-size:16px}
+a{color:inherit;text-decoration:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:58px;background:var(--black);border-bottom:2px solid var(--red)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--white);letter-spacing:1px}
+.logo span{color:var(--red3)}
+.nav-book{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;background:var(--red);color:var(--white);padding:9px 16px;font-weight:600}
+.hero{min-height:78vh;background:var(--black);padding:88px 20px 40px;display:flex;flex-direction:column;justify-content:center}
+.hero-tag{font-family:monospace;font-size:0.65rem;color:var(--red3);letter-spacing:1px;border:1px solid rgba(222,126,108,0.35);padding:7px 14px;display:inline-block;margin-bottom:22px;width:fit-content}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,11vw,3.2rem);letter-spacing:0.5px;color:var(--white);line-height:0.95;margin-bottom:18px}
+.h-title span{color:var(--red3)}
+.h-sub{font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:28px;max-width:400px}
+.h-cta{display:block;background:var(--red);color:var(--white);font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;padding:18px;text-align:center;font-weight:700}
+.urgency{background:var(--red);padding:14px 20px;text-align:center}
+.urgency-text{font-family:'Bebas Neue',sans-serif;color:var(--white);font-size:1rem;letter-spacing:0.5px}
+.services{padding:44px 20px;background:var(--steel)}
+.sv-tag{font-family:monospace;font-size:0.62rem;letter-spacing:1px;color:var(--red2);margin-bottom:14px}
+.sv-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,8vw,2.4rem);margin-bottom:24px}
+.sv-title span{color:var(--red2)}
+.sv-row{display:flex;align-items:center;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+.sv-name{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:0.5px;flex:1}
+.booking{padding:44px 20px;background:var(--black)}
+.bk-tag{font-family:monospace;font-size:0.62rem;letter-spacing:1px;color:var(--red3);margin-bottom:14px}
+.bk-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,8vw,2.4rem);color:var(--white);margin-bottom:22px}
+.bk-title span{color:var(--red3)}
+.bk-item{padding:14px 0;border-top:1px solid rgba(255,255,255,0.1);font-size:0.85rem;color:rgba(255,255,255,0.55)}
+.bk-item:last-child{border-bottom:1px solid rgba(255,255,255,0.1)}
+.bk-item strong{color:var(--white);display:block;margin-bottom:3px}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--white);margin:26px 0 18px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-family:monospace;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px}
+.form-group input,.form-group select{width:100%;border:none;border-bottom:1px solid rgba(255,255,255,0.2);padding:11px 0;font-size:1rem;font-family:'Space Grotesk',sans-serif;color:var(--white);background:transparent;outline:none}
+.form-group select option{background:var(--black)}
+.btn-form{width:100%;background:var(--red);color:var(--white);font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;padding:17px;border:none;margin-top:6px;font-weight:700}
+footer{padding:26px 20px;background:var(--black);border-top:2px solid var(--red);text-align:center}
+.footer-logo{font-family:'Bebas Neue',sans-serif;color:var(--white);font-size:1.05rem}
+.footer-copy{font-family:monospace;font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:6px}
+@media(min-width:640px){.hero,.services,.booking{padding-left:40px;padding-right:40px}nav{padding:0 40px}}
+@media(min-width:900px){nav{padding:0 56px}.hero{padding:0 56px}.services,.booking{padding:80px 56px}.booking{display:grid;grid-template-columns:1fr 1fr;gap:60px}}
+</style></head><body>
+<nav><a href="#" class="logo">CERRAJERÍA <span>24H</span></a><a href="tel:600000000" class="nav-book">Llamar →</a></nav>
+<section class="hero"><div class="hero-tag">// URGENCIAS 24H</div>
+<h1 class="h-title">TE ABRIMOS<br><span>EN MINUTOS.</span></h1>
+<p class="h-sub">Apertura de puertas, cambio de bombines y urgencias 24 horas en Bilbao. Respuesta inmediata.</p>
+<a href="tel:600000000" class="h-cta">Llamar ahora →</a></section>
+<div class="urgency"><span class="urgency-text">⚡ URGENCIAS 24H · TODOS LOS DÍAS DEL AÑO</span></div>
+<section class="services"><div class="sv-tag">// SERVICIOS</div>
+<h2 class="sv-title">LO QUE <span>HACEMOS.</span></h2>
+<div class="sv-row"><span class="sv-name">APERTURA DE PUERTAS</span></div>
+<div class="sv-row"><span class="sv-name">CAMBIO DE BOMBINES</span></div>
+<div class="sv-row"><span class="sv-name">CERRADURAS DE SEGURIDAD</span></div>
+</section>
+<section class="booking" id="reservar"><div class="bk-tag">// CONTACTO</div>
+<h2 class="bk-title">TE AYUDAMOS<br><span>AHORA MISMO.</span></h2>
+<div class="bk-item"><strong>WhatsApp</strong>Respuesta inmediata</div>
+<div class="bk-item"><strong>24 horas, 365 días</strong>Sin excepciones</div>
+<h3 class="form-title">SOLICITAR AYUDA</h3>
+<div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+<div class="form-group"><label>Teléfono</label><input type="tel" placeholder="600 000 000"></div>
+<div class="form-group"><label>Urgencia</label><select><option value="">Selecciona</option><option>Puerta cerrada</option><option>Cambio de bombín</option><option>Otra</option></select></div>
+<button class="btn-form">Enviar solicitud</button></section>
+<footer><div class="footer-logo">CERRAJERÍA 24H</div><div class="footer-copy">© 2026 — BILBAO</div></footer>
+</body></html>
