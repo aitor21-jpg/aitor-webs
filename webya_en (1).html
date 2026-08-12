@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>webYa — Your website, your way</title>
+<meta name="description" content="Professional websites for Bilbao businesses, custom-built by sector. See your sample site before deciding anything, no strings attached.">
+<meta property="og:title" content="webYa — Your website, your way">
+<meta property="og:description" content="Professional websites for Bilbao businesses, custom-built by sector. See your sample site before deciding anything, no strings attached.">
+<meta property="og:url" content="https://webya.studio/webya_en.html">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://webya.studio/og-image.jpg">
+<meta name="twitter:image" content="https://webya.studio/og-image.jpg">
+<meta name="twitter:card" content="summary">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0B0D; --bg2:#131519; --text:#ECE9E2; --slate:#8B92A0; --white:#FFF; --line:rgba(255,255,255,0.1);
+  --ink:#ECE9E2; --paper:#0A0B0D; --paper2:#131519;
+  /* dynamic theme vars — JS overwrites these */
+  --accent:#D9BE8F; --accent2:#D9BE8F; --accent3:#D9BE8F;
+  --transition-speed: 0.7s;
+}
+html{scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-weight:400;font-size:16px;line-height:1.5;transition:background var(--transition-speed) ease}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;border:none;cursor:pointer;background:none}
+::selection{background:var(--accent3);color:var(--ink)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:rgba(10,11,13,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.logo{font-family:'Newsreader',serif;font-size:1.15rem;font-style:italic}
+.logo b{font-style:normal;font-weight:500;color:var(--accent2);transition:color var(--transition-speed) ease}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-link{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase;color:var(--slate)}
+.nav-cta{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:2px}
+
+/* ===== HERO — the signature element ===== */
+.hero{padding:100px 20px 40px;position:relative}
+.hero-content{position:relative;z-index:5}
+.hero-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);border:1px solid var(--accent3);padding:6px 12px;display:inline-block;margin-bottom:24px;transition:color var(--transition-speed) ease, border-color var(--transition-speed) ease}
+.hero-title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(2.1rem,8.5vw,3.4rem);line-height:1.08;letter-spacing:-0.5px;margin-bottom:8px;color:var(--ink)}
+.hero-title .dynamic-word{font-style:italic;color:var(--accent2);display:inline-block;transition:color var(--transition-speed) ease}
+.hero-sub{font-size:0.95rem;color:var(--slate);line-height:1.7;max-width:460px;margin:18px 0 28px}
+
+/* 3D stage — a contained "display case", never full-bleed behind text */
+.stage{position:relative;height:44vh;min-height:280px;max-height:420px;border-radius:6px;overflow:hidden;background:var(--bg2);margin:8px 0 32px;border:1px solid var(--line)}
+#hero-canvas{position:absolute;inset:0;display:block}
+.stage-label{position:absolute;bottom:14px;left:16px;z-index:5;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;color:rgba(236,233,226,0.5)}
+.stage-sector{position:absolute;bottom:14px;right:16px;z-index:5;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.5px;color:var(--accent3);transition:color var(--transition-speed) ease}
+
+/* Sector picker — the interactive core */
+.picker-label{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--slate);margin-bottom:12px}
+.picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px}
+.picker-chip{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.3px;padding:10px 16px;border:1px solid var(--line);border-radius:20px;color:var(--slate);background:var(--bg2);transition:all 0.3s ease}
+.picker-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.picker-chip:active{transform:scale(0.96)}
+
+.hero-ctas{display:flex;flex-direction:column;gap:12px}
+.btn-primary{background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:0.78rem;letter-spacing:0.5px;text-transform:uppercase;padding:17px 24px;text-align:center;border-radius:2px}
+.btn-secondary{border:1px solid var(--ink);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:0.78rem;letter-spacing:0.5px;text-transform:uppercase;padding:16px 24px;text-align:center;border-radius:2px}
+.btn-live{display:block;background:var(--accent);color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.5px;text-transform:uppercase;padding:14px 20px;text-align:center;border-radius:2px;margin-top:8px;transition:background var(--transition-speed) ease}
+
+/* ===== Explanation strip ===== */
+.explain{padding:36px 20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.explain-text{font-family:'Newsreader',serif;font-style:italic;font-size:1.15rem;line-height:1.5;color:var(--slate);max-width:520px}
+.explain-text strong{font-style:normal;color:var(--ink);font-weight:500}
+
+/* ===== Stats ===== */
+.stats{padding:44px 20px;border-bottom:1px solid var(--line)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.stat-num{font-family:'Newsreader',serif;font-style:italic;font-size:2.4rem;color:var(--accent2);line-height:1;transition:color var(--transition-speed) ease}
+.stat-label{font-family:'IBM Plex Mono',monospace;font-size:0.64rem;letter-spacing:0.5px;text-transform:uppercase;color:var(--slate);margin-top:6px}
+
+/* ===== Section shared ===== */
+.section{padding:52px 20px}
+.section-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);margin-bottom:16px;transition:color var(--transition-speed) ease}
+.section-title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(1.8rem,7vw,2.4rem);line-height:1.15;margin-bottom:16px}
+.section-title em{font-style:italic;color:var(--accent2);transition:color var(--transition-speed) ease}
+.section-body{color:var(--slate);font-size:0.95rem;line-height:1.7;max-width:520px}
+
+/* ===== Gallery ===== */
+.gallery-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:32px}
+/* Card 3D tilt-in on scroll — gives every card genuine depth */
+.spec-card{border:1px solid var(--line);background:var(--bg2);border-radius:3px;overflow:hidden;transform:perspective(800px) rotateX(8deg) translateY(24px);opacity:0;transition:transform .7s cubic-bezier(0.16,1,0.3,1), opacity .7s ease, box-shadow .3s ease}
+.spec-card.visible{transform:perspective(800px) rotateX(0deg) translateY(0);opacity:1}
+.spec-card:active{transform:perspective(800px) scale(0.97)}
+.spec-card:hover{box-shadow:0 16px 32px -12px rgba(0,0,0,0.5);border-color:var(--accent)}
+
+/* Floating accent orb — small ambient 3D window in the explain strip, gives continuity of depth down the page */
+.explain{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.explain-orb{width:64px;height:64px;flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 35% 30%, var(--accent3), var(--accent) 55%, var(--accent2) 100%);transition:background var(--transition-speed) ease;box-shadow:0 8px 24px -8px var(--accent);animation:orbFloat 4s ease-in-out infinite}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.04)}}
+.spec-swatch{height:110px;position:relative;display:flex;align-items:flex-end;padding:16px}
+.spec-swatch::before{content:'';position:absolute;inset:0;opacity:0.92}
+.spec-sector{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.75);position:relative;z-index:2}
+.spec-body{padding:16px 18px 18px}
+.spec-name{font-family:'Newsreader',serif;font-size:1.25rem;margin-bottom:10px}
+.spec-link{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent2);border-top:1px solid var(--line);padding-top:10px;display:flex;justify-content:space-between;align-items:center}
+
+.sw-rose::before{background:linear-gradient(135deg,#C4846A,#9C5E6B)}
+.sw-teal::before{background:linear-gradient(135deg,#4A8B7C,#356359)}
+.sw-amber::before{background:linear-gradient(135deg,#C9762E,#8A4E20)}
+.sw-sage::before{background:linear-gradient(135deg,#8A9A80,#647159)}
+.sw-violet::before{background:linear-gradient(135deg,#7C5FB0,#5A4380)}
+.sw-blue::before{background:linear-gradient(135deg,#3E6EA8,#2C5180)}
+.sw-red::before{background:linear-gradient(135deg,#B8402E,#8A2F22)}
+.sw-terra::before{background:linear-gradient(135deg,#B87454,#8C5738)}
+.sw-mustard::before{background:linear-gradient(135deg,#D9A441,#A87C2E)}
+
+/* ===== Process ===== */
+.process{padding:52px 20px;background:var(--ink);color:var(--paper)}
+.process .section-eyebrow{color:var(--accent3)}
+.process .section-title{color:var(--paper)}
+.process .section-title em{color:var(--accent3)}
+.proc-list{margin-top:32px;display:flex;flex-direction:column}
+.proc-item{padding:22px 0;border-top:1px solid rgba(10,11,13,0.15);display:flex;gap:18px}
+.proc-item:last-child{border-bottom:1px solid rgba(10,11,13,0.15)}
+.proc-num{font-family:'Newsreader',serif;font-style:italic;font-size:1.5rem;color:var(--accent3);flex-shrink:0;width:30px;transition:color var(--transition-speed) ease}
+.proc-name{font-size:1.02rem;margin-bottom:5px}
+.proc-desc{font-size:0.83rem;color:rgba(10,11,13,0.6);line-height:1.6}
+
+/* ===== Contact ===== */
+.contact{padding:52px 20px;background:var(--paper2)}
+.contact-title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(1.8rem,7vw,2.4rem);margin-bottom:20px}
+.contact-title em{font-style:italic;color:var(--accent2);transition:color var(--transition-speed) ease}
+.contact-item{padding:16px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.contact-item:last-child{border-bottom:1px solid var(--line)}
+.ci-label{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--slate)}
+.ci-value{font-size:0.92rem}
+.ci-value a{color:var(--accent2);border-bottom:1px solid var(--accent3);transition:color var(--transition-speed) ease}
+
+footer{padding:28px 20px;text-align:center;border-top:1px solid var(--line)}
+.footer-text{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--slate);letter-spacing:0.5px}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(min-width:700px){
+  nav{padding:22px 48px}
+  .hero,.explain,.stats,.section,.process,.contact{padding-left:48px;padding-right:48px}
+  .stats-grid{grid-template-columns:repeat(4,1fr)}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-ctas{flex-direction:row}
+  .btn-primary,.btn-secondary{flex:0 0 auto;padding:17px 32px}
+  .btn-live{display:inline-block;margin-top:0;margin-left:12px}
+}
+@media(min-width:1000px){
+  nav{padding:24px 64px}
+  .hero,.explain,.stats,.section,.process,.contact{padding-left:64px;padding-right:64px}
+  .gallery-grid{grid-template-columns:repeat(3,1fr)}
+  .hero{padding-top:0}
+  .hero-content{max-width:640px}
+}
+
+.sticky-wa{position:fixed;bottom:20px;right:20px;z-index:400;background:#25D366;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,0.3);transition:transform .2s ease}
+.sticky-wa:active{transform:scale(0.92)}
+.sticky-wa svg{width:28px;height:28px;fill:#fff}
+@media(min-width:1000px){.sticky-wa{bottom:32px;right:32px}}
+
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:500;background:#131519;border-top:1px solid rgba(255,255,255,0.12);padding:18px 20px;display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cookie-banner.show{display:flex}
+.cookie-text{font-size:0.82rem;color:#B8BFC9;line-height:1.5;flex:1;min-width:240px}
+.cookie-text a{color:#D9BE8F}
+.cookie-actions{display:flex;gap:10px;flex-shrink:0}
+.cookie-btn{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.5px;text-transform:uppercase;padding:11px 18px;border-radius:2px;cursor:pointer}
+.cookie-accept{background:#ECE9E2;color:#0A0B0D;border:none}
+.cookie-reject{background:transparent;color:#8B92A0;border:1px solid rgba(255,255,255,0.15)}
+@media(max-width:600px){.cookie-banner{flex-direction:column;align-items:stretch}.cookie-actions{justify-content:stretch}.cookie-btn{flex:1}}
+</style>
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TV2X9FG8" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a href="#" class="logo">web<b>Ya</b></a>
+  <div class="nav-links">
+    <a href="tienda_en.html" class="nav-link">Templates</a>
+    <a href="index.html" class="nav-link">ES</a>
+    <a href="#contact" class="nav-cta">Let's talk</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow reveal">WEBSITES FOR BUSINESSES · BILBAO</div>
+    <h1 class="hero-title reveal">Your <span class="dynamic-word" id="dynamicWord">beauty salon</span> website,<br>built for <em style="font-style:italic">you.</em></h1>
+    <p class="hero-sub reveal">Pick your sector and watch everything change — every business gets its own identity, not a generic template with the name swapped.</p>
+
+    <div class="picker-label reveal">TAP A SECTOR ↓</div>
+    <div class="picker reveal" id="picker">
+      <button class="picker-chip active" data-theme="rose" data-word="beauty salon" data-sector="Beauty">Beauty</button>
+      <button class="picker-chip" data-theme="teal" data-word="physiotherapy" data-sector="Physio">Physio</button>
+      <button class="picker-chip" data-theme="amber" data-word="auto shop" data-sector="Auto Shop">Auto Shop</button>
+      <button class="picker-chip" data-theme="violet" data-word="music school" data-sector="Music">Music</button>
+      <button class="picker-chip" data-theme="sage" data-word="therapy practice" data-sector="Therapy">Therapy</button>
+      <button class="picker-chip" data-theme="terra" data-word="renovation" data-sector="Renovation">Renovation</button>
+      <button class="picker-chip" data-theme="red" data-word="locksmith" data-sector="Locksmith">Locksmith</button>
+      <button class="picker-chip" data-theme="blue" data-word="language school" data-sector="Languages">Languages</button>
+    </div>
+
+    <div class="stage reveal">
+      <canvas id="hero-canvas"></canvas>
+      <span class="stage-label">LIVE PREVIEW</span>
+      <span class="stage-sector" id="stageSector">BEAUTY</span>
+    </div>
+
+    <div class="hero-ctas">
+      <a href="#work" class="btn-primary">See real work</a>
+      <a href="#contact" class="btn-secondary">Get mine</a>
+    </div>
+  </div>
+</section>
+
+<section class="explain">
+  <div class="explain-orb"></div>
+  <p class="explain-text reveal">No two businesses are the same, so <strong>no two websites should be either.</strong> Every sector above has its own palette, typography and shape — built for that kind of business, not recycled.</p>
+</section>
+
+<section class="stats">
+  <div class="stats-grid">
+    <div class="reveal"><div class="stat-num">40+</div><div class="stat-label">Sites built</div></div>
+    <div class="reveal"><div class="stat-num">20+</div><div class="stat-label">Different sectors</div></div>
+    <div class="reveal"><div class="stat-num">0€</div><div class="stat-label">Cost of the sample</div></div>
+    <div class="reveal"><div class="stat-num">24h</div><div class="stat-label">Delivery time</div></div>
+  </div>
+</section>
+
+<section class="section" id="work">
+  <div class="section-eyebrow reveal">Real work</div>
+  <h2 class="section-title reveal">This isn't<br>a <em>demo.</em></h2>
+  <p class="section-body reveal">These are real websites, already delivered to real businesses in Bilbao. Tap any of them to see it working for real.</p>
+</section>
+
+<div class="section" style="padding-top:0">
+  <div class="gallery-grid">
+    <div class="spec-card">
+      <div class="spec-swatch sw-rose"><span class="spec-sector">Beauty center</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Mima-T</div>
+        <a href="mimat_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-teal"><span class="spec-sector">Physiotherapy</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Cuadra</div>
+        <a href="cuadra_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-amber"><span class="spec-sector">Auto repair</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Talleres Abando</div>
+        <a href="talleresabando_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-terra"><span class="spec-sector">Florist</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Silk Flowers</div>
+        <a href="silkflowers_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-sage"><span class="spec-sector">Psychology practice</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Consulta de Psicología</div>
+        <a href="psicologia_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-violet"><span class="spec-sector">Music school</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Academia Muzzik</div>
+        <a href="academiamuzzik_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-blue"><span class="spec-sector">Language school</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Academia Idiomas Bilbao</div>
+        <a href="idiomas_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-mustard"><span class="spec-sector">Pet store</span></div>
+      <div class="spec-body">
+        <div class="spec-name">DOGGUAO</div>
+        <a href="dogguao_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-swatch sw-red"><span class="spec-sector">24h Locksmith</span></div>
+      <div class="spec-body">
+        <div class="spec-name">Cerrajería Urgente</div>
+        <a href="cerrajeria_web.html" class="spec-link" target="_blank"><span>View live site</span><span>→</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="process">
+  <div class="section-eyebrow reveal">How it works</div>
+  <h2 class="section-title reveal">Three steps,<br><em>no hassle.</em></h2>
+  <div class="proc-list">
+    <div class="proc-item reveal">
+      <div class="proc-num">01</div>
+      <div><div class="proc-name">I look at your business</div><p class="proc-desc">I check what you do, how you present it now, and what your online presence is missing.</p></div>
+    </div>
+    <div class="proc-item reveal">
+      <div class="proc-num">02</div>
+      <div><div class="proc-name">I build it, unprompted</div><p class="proc-desc">I build a complete sample website in under 24h, matching your sector and your real services.</p></div>
+    </div>
+    <div class="proc-item reveal">
+      <div class="proc-num">03</div>
+      <div><div class="proc-name">You decide</div><p class="proc-desc">You see the whole thing, no strings attached. If you like it, we fine-tune it and launch. If not, it cost nothing.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <h2 class="contact-title">Let's talk <em>whenever.</em></h2>
+  <div class="contact-item">
+    <span class="ci-label">WhatsApp</span>
+    <span class="ci-value"><a href="https://wa.me/34682539732" target="_blank">Message me — reply within 24h</a></span>
+  </div>
+  <div class="contact-item">
+    <span class="ci-label">Area</span>
+    <span class="ci-value">Bilbao and surrounding area</span>
+  </div>
+  <div class="contact-item">
+    <span class="ci-label">Email</span>
+    <span class="ci-value"><a href="mailto:aitor.orduna@gmail.com">aitor.orduna@gmail.com</a></span>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-text">© 2026 WEBYA — BILBAO</div><div style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:0.3px"><a href="aviso-legal.html" style="color:#8B92A0;margin:0 8px">Legal Notice</a>·<a href="politica-privacidad.html" style="color:#8B92A0;margin:0 8px">Privacy</a>·<a href="politica-cookies.html" style="color:#8B92A0;margin:0 8px">Cookies</a></div>
+</footer>
+
+<script>
+document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1}).observe(el));
+document.querySelectorAll('.spec-card').forEach((el,i)=>new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'), (i%3)*90);}});},{threshold:0.15}).observe(el));
+
+// ═══ Theme presets — matching real sector palettes ═══
+const THEMES = {
+  rose:   { accent:'#C4846A', accent2:'#9C5E6B', accent3:'#E3B8C0' },
+  teal:   { accent:'#4A8B7C', accent2:'#356359', accent3:'#8FC4B5' },
+  amber:  { accent:'#C9762E', accent2:'#8A4E20', accent3:'#D89460' },
+  violet: { accent:'#7C5FB0', accent2:'#5A4380', accent3:'#A98FD1' },
+  sage:   { accent:'#8A9A80', accent2:'#647159', accent3:'#B5C2AC' },
+  terra:  { accent:'#B87454', accent2:'#8C5738', accent3:'#D9A382' },
+  red:    { accent:'#B8402E', accent2:'#8A2F22', accent3:'#DE7E6C' },
+  blue:   { accent:'#3E6EA8', accent2:'#2C5180', accent3:'#8BB4D9' },
+};
+
+const root = document.documentElement;
+const dynamicWord = document.getElementById('dynamicWord');
+const stageSector = document.getElementById('stageSector');
+const chips = document.querySelectorAll('.picker-chip');
+
+function applyTheme(themeName, word, sectorLabel) {
+  const t = THEMES[themeName];
+  if (!t) return;
+  root.style.setProperty('--accent', t.accent);
+  root.style.setProperty('--accent2', t.accent2);
+  root.style.setProperty('--accent3', t.accent3);
+  dynamicWord.style.opacity = '0';
+  stageSector.style.opacity = '0';
+  setTimeout(() => {
+    dynamicWord.textContent = word;
+    dynamicWord.style.opacity = '1';
+    stageSector.textContent = sectorLabel.toUpperCase();
+    stageSector.style.opacity = '1';
+  }, 250);
+  morph3D(themeName);
+}
+dynamicWord.style.transition = 'opacity 0.25s ease';
+stageSector.style.transition = 'opacity 0.25s ease';
+
+chips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    chips.forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    applyTheme(chip.dataset.theme, chip.dataset.word, chip.dataset.sector);
+  });
+});
+
+// ═══ 3D scene — morphs shape + color per sector ═══
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const container = canvas.parentElement;
+  function size(){ return { w: container.clientWidth, h: container.clientHeight }; }
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  let s = size();
+  renderer.setSize(s.w, s.h);
+  renderer.setClearColor(0x131519, 1);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0A0B0D, 0.02);
+  const camera = new THREE.PerspectiveCamera(45, s.w / s.h, 0.1, 100);
+  camera.position.set(0, 0, 8);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4);
+  key.position.set(4, 6, 4);
+  scene.add(key);
+  const pointLight = new THREE.PointLight(0xC4846A, 3.6, 14);
+  pointLight.position.set(-3, 1, 3);
+  scene.add(pointLight);
+  // Studio rim lights — give the clearcoat/glass material real highlights and edge definition
+  const rimA = new THREE.PointLight(0xFFFFFF, 1.8, 12);
+  rimA.position.set(3, 2, -3);
+  scene.add(rimA);
+  const rimB = new THREE.PointLight(0xFFFFFF, 1.2, 10);
+  rimB.position.set(-2, -2, 4);
+  scene.add(rimB);
+
+  let currentGroup = new THREE.Group();
+  scene.add(currentGroup);
+
+  function hexToThree(hex){ return parseInt(hex.replace('#','0x')); }
+
+  function buildShape(themeName) {
+    const t = THEMES[themeName] || THEMES.rose;
+    // Premium glass/chrome PBR material — no external assets needed, just physically-based lighting
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: hexToThree(t.accent),
+      metalness: 0.65,
+      roughness: 0.12,
+      clearcoat: 1,
+      clearcoatRoughness: 0.08,
+      reflectivity: 1,
+      emissive: hexToThree(t.accent2),
+      emissiveIntensity: 0.12,
+      envMapIntensity: 1.4
+    });
+    const g = new THREE.Group();
+
+    if (themeName === 'rose') { // estetica - orbs
+      for (let i = 0; i < 7; i++) {
+        const orb = new THREE.Mesh(new THREE.SphereGeometry(0.18 + Math.random()*0.25, 20, 20), mat);
+        orb.position.set((Math.random()-0.5)*4, (Math.random()-0.5)*3.2, (Math.random()-0.5)*2);
+        g.add(orb);
+      }
+    } else if (themeName === 'teal') { // fisio - torus rings
+      for (let i = 0; i < 4; i++) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5+i*0.35, 0.05, 12, 40), mat);
+        ring.rotation.x = Math.PI/2.3; ring.rotation.z = i*0.4;
+        g.add(ring);
+      }
+    } else if (themeName === 'amber') { // mecanica - gears
+      for (let i=0;i<3;i++){
+        const gear = new THREE.Mesh(new THREE.CylinderGeometry(0.5-i*0.12,0.5-i*0.12,0.18,10),mat);
+        gear.position.set((i-1)*0.7, 0, 0); gear.rotation.x = Math.PI/2;
+        g.add(gear);
+      }
+    } else if (themeName === 'violet') { // musica - guitar-like
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.75,0.75,0.22,32), mat);
+      body.scale.set(1,1,0.65); g.add(body);
+      const neck = new THREE.Mesh(new THREE.BoxGeometry(0.16,1.5,0.09), mat);
+      neck.position.y = 1.05; g.add(neck);
+    } else if (themeName === 'sage') { // psicologia - mandala rings
+      for (let i=0;i<4;i++){
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.4+i*0.32,0.028,10,44),mat);
+        ring.rotation.x = Math.PI/2; ring.rotation.y = i*0.35;
+        g.add(ring);
+      }
+      const core = new THREE.Mesh(new THREE.SphereGeometry(0.22,20,20),mat); g.add(core);
+    } else if (themeName === 'terra') { // reformas - house frame
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(1.5,1.1,1.1), new THREE.MeshBasicMaterial({color: hexToThree(t.accent), wireframe:true}));
+      g.add(frame);
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.0,0.55,4), mat);
+      roof.position.y = 0.82; roof.rotation.y = Math.PI/4; g.add(roof);
+    } else if (themeName === 'red') { // cerrajeria - key/lock abstraction
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.4,0.13,16,32), mat);
+      g.add(ring);
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.1,12), mat);
+      shaft.rotation.z = Math.PI/2; shaft.position.x = 0.75; g.add(shaft);
+    } else if (themeName === 'blue') { // idiomas - globe
+      const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.75,32,32), mat);
+      g.add(sphere);
+      for (let i=0;i<3;i++){
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.8,0.014,8,48), new THREE.MeshBasicMaterial({color: hexToThree(t.accent3), transparent:true, opacity:0.5}));
+        ring.rotation.y = i*Math.PI/3; g.add(ring);
+      }
+    }
+    return g;
+  }
+
+  currentGroup.add(...buildShape('rose').children);
+
+  window.morph3D = function(themeName) {
+    const t = THEMES[themeName];
+    if (t) pointLight.color.set(hexToThree(t.accent));
+    // fade out
+    let fadeOut = { v: 1 };
+    const fadeInterval = setInterval(() => {
+      fadeOut.v -= 0.12;
+      currentGroup.children.forEach(c => { if (c.material) c.material.opacity = Math.max(fadeOut.v,0); });
+      if (fadeOut.v <= 0) {
+        clearInterval(fadeInterval);
+        scene.remove(currentGroup);
+        currentGroup = new THREE.Group();
+        const shape = buildShape(themeName);
+        shape.children.forEach(c => { if(c.material){ c.material.transparent = true; c.material.opacity = 0; }});
+        currentGroup.add(...shape.children);
+        scene.add(currentGroup);
+        let fadeIn = { v: 0 };
+        const fadeInInterval = setInterval(() => {
+          fadeIn.v += 0.12;
+          currentGroup.children.forEach(c => { if (c.material) c.material.opacity = Math.min(fadeIn.v,1); });
+          if (fadeIn.v >= 1) clearInterval(fadeInInterval);
+        }, 25);
+      }
+    }, 25);
+  };
+
+  window.addEventListener('resize', () => {
+    s = size();
+    camera.aspect = s.w / s.h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(s.w, s.h);
+  });
+
+  // Mouse parallax — the stage reacts to cursor, feels alive not static
+  let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+  });
+  container.addEventListener('mouseleave', () => { mouseX = 0; mouseY = 0; });
+
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    targetX += (mouseX - targetX) * 0.04;
+    targetY += (mouseY - targetY) * 0.04;
+    camera.position.x = targetX * 0.9;
+    camera.position.y = -targetY * 0.6;
+    camera.lookAt(0, 0, 0);
+    currentGroup.rotation.y = t * 0.18;
+    currentGroup.children.forEach((o,i) => { o.position.y += Math.sin(t*0.4+i)*0.0015; });
+    pointLight.intensity = 3.2 + Math.sin(t*1.2)*0.8;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+
+
+<a href="https://wa.me/34682539732" class="sticky-wa" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.05 2h-.01zm5.83 14.07c-.24.68-1.4 1.3-1.94 1.38-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.14-4.9-4.33-.14-.19-1.17-1.56-1.17-2.98 0-1.41.74-2.11 1-2.4.26-.29.57-.36.76-.36h.55c.18 0 .42-.02.65.5.24.55.81 1.9.88 2.04.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.81.86.26.14.44.21.5.32.06.12.06.68-.18 1.36z"/></svg>
+</a>
+
+<div class="cookie-banner" id="cookieBanner">
+  <p class="cookie-text">Usamos cookies técnicas y, si aceptas, de analítica para saber cómo se usa la web. Más info en la <a href="politica-cookies.html">Política de Cookies</a>.</p>
+  <div class="cookie-actions">
+    <button class="cookie-btn cookie-reject" onclick="rejectCookies()">Rechazar</button>
+    <button class="cookie-btn cookie-accept" onclick="acceptCookies()">Aceptar</button>
+  </div>
+</div>
+<script>
+(function(){
+  var GTM_ID = "GTM-TV2X9FG8";
+  function loadGTM(){
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',GTM_ID);
+  }
+  window.acceptCookies = function(){
+    localStorage.setItem('cookieConsent','accepted');
+    document.getElementById('cookieBanner').classList.remove('show');
+    loadGTM();
+  };
+  window.rejectCookies = function(){
+    localStorage.setItem('cookieConsent','rejected');
+    document.getElementById('cookieBanner').classList.remove('show');
+  };
+  var consent = localStorage.getItem('cookieConsent');
+  if(consent === 'accepted'){ loadGTM(); }
+  else if(consent !== 'rejected'){ document.getElementById('cookieBanner').classList.add('show'); }
+})();
+</script>
+</body>
+</html>
